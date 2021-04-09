@@ -1,0 +1,36 @@
+body{
+    background-color:white;
+  }
+  .center_div{
+      margin: 0 auto;
+      width: 100%;
+  }
+  .timezone{
+      background: rgb(207, 206, 206);
+      text-align: center;
+  }
+  .submitbutton{
+      text-align: left;
+      margin-top: 3%;
+      display: block;
+      width: 100%;
+  }
+  .container{
+      margin-top: 9%;
+  }
+  .form-container{
+      margin-top: 3%;
+      padding:50px 60px; 
+  }
+  .newlink{
+      text-align: right;
+      text-decoration: b;
+  }
+  .cancelbtn, .signupbtn {
+      float: left;
+      width: 50%;
+  }
+ .form input{
+    float: right; 
+    width: 250px;
+ }
