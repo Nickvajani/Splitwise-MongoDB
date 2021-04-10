@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 let Group = require("../../models/createGroupModel");
+const Transaction = require("../../models/transactionModel");
 
 router.get("/invites", (req, res) => {
   var current_user = req.header("user");
@@ -17,7 +18,6 @@ router.get("/invites", (req, res) => {
       if (err) {
         res.status(401).json({ msg: err });
       } else {
-        console.log(result.length);
         let dbNotJoinedGroups = [];
         for (let i = 0; i < result.length; i++) {
           let notgroupobj = {
@@ -61,8 +61,6 @@ router.put("/:id/accept", (req, res) => {
 
 router.get("/joined", (req, res) => {
   var current_user = req.header("user");
-  console.log(current_user);
-
   Group.find(
     {
       members: {
@@ -73,7 +71,6 @@ router.get("/joined", (req, res) => {
       if (err) {
         res.status(401).json({ msg: err });
       } else {
-        console.log(result.length);
         let dbNotJoinedGroups = [];
         for (let i = 0; i < result.length; i++) {
           let notgroupobj = {
@@ -115,6 +112,33 @@ router.post("/getGroups", (req, res) => {
     }
   );
 });
+
+router.delete("/leave/:g_id", async (req,res) => {
+  var current_user = req.header("user");
+  Transaction.find({"ower.u_id" : current_user,"ower.is_settled":false , g_id: req.params.g_id} ,async(err,result) =>{
+    if(err){
+      console.log(err)
+    }else{
+      if(result.length!==0){
+        console.log("Due left")
+        res.status(204).send({ msg: "Please Settle your pending balance in the group" });
+      }else{
+        const left = await leaveGroup(req.params.g_id, current_user);
+        console.log(left);
+        res.status(200).send({ msg: left });      }
+    }
+  })
+})
+const leaveGroup = async (g_id, current_user) => {
+  Group.deleteOne({_id:g_id , "members.ID": current_user}, (err,result) => {
+    if (result) {
+      return { msg: "You left the group successfully" };
+    }else{
+      console.log(err)
+    }
+  })
+  
+};
 
 module.exports = router;
 

@@ -92,7 +92,7 @@ class Dashboard extends Component {
         },
       })
       .then((response) => {
-        console.log(response.data);
+        console.log(response.data.length);
         let s = {};
         for (let obj of response.data) {
           if (!s[obj.group_name]) s[obj.group_name] = [];
@@ -315,8 +315,7 @@ class Dashboard extends Component {
                 settleGroupNameResults: [],
                 settlePersonResults: [],
                 settleFlag: true
-
-              });
+              },() => {console.log(this.state.show)});
             }
             
           }).catch((err) => {

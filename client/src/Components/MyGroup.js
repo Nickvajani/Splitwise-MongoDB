@@ -147,7 +147,7 @@ class MyGroup extends Component {
     axiosInstance.defaults.withCredentials = true;
     const response = await axiosInstance
       .delete(
-        "/mygroup/leave/" +
+        "/mygroups/leave/" +
           data.g_id,
         {
           headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },

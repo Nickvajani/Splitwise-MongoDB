@@ -17,7 +17,7 @@ class RecentActivity extends Component {
     axiosInstance.defaults.withCredentials = true;
     const response1 = await axiosInstance
       .get(
-        "/currentUserDetails",
+        "/groups/userDetails",
         {
           headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
         }
@@ -55,9 +55,12 @@ class RecentActivity extends Component {
       let amount = parseFloat(value);
       if (amount >= 1) {
         return ` You Owe ${this.state.userDefaultCurrency}${amount}`;
-      } else {
+      } else if(amount<0){
         let newAmount = amount * -1;
         return `You Get back ${this.state.userDefaultCurrency}${newAmount}`;
+      }else{
+        return ` This transaction is settled`;
+
       }
     };
     let checkName = (value) => {
