@@ -26,7 +26,7 @@ router.get("/invites", (req, res) => {
           };
           dbNotJoinedGroups.push(notgroupobj);
         }
-        console.log(dbNotJoinedGroups);
+        // console.log(dbNotJoinedGroups);
         res.status(200).send(dbNotJoinedGroups);
       }
     }
@@ -34,7 +34,7 @@ router.get("/invites", (req, res) => {
 });
 
 router.put("/:id/accept", (req, res) => {
-  console.log("hi");
+  console.log("from accept");
   var current_user = req.header("user");
   var group_id = req.params.id;
 
@@ -79,7 +79,7 @@ router.get("/joined", (req, res) => {
           };
           dbNotJoinedGroups.push(notgroupobj);
         }
-        console.log(dbNotJoinedGroups);
+        // console.log(dbNotJoinedGroups);
         res.status(200).send(dbNotJoinedGroups);
       }
     }
@@ -123,6 +123,7 @@ router.delete("/leave/:g_id", async (req,res) => {
         console.log("Due left")
         res.status(204).send({ msg: "Please Settle your pending balance in the group" });
       }else{
+
         const left = await leaveGroup(req.params.g_id, current_user);
         console.log(left);
         res.status(200).send({ msg: left });      }
@@ -130,8 +131,9 @@ router.delete("/leave/:g_id", async (req,res) => {
   })
 })
 const leaveGroup = async (g_id, current_user) => {
-  Group.deleteOne({_id:g_id , "members.ID": current_user}, (err,result) => {
+  Group.findOneAndUpdate({_id:g_id },{$pull:{members:{ID:current_user}}},{multi:true} ,(err,result) => {
     if (result) {
+      console.log(result)
       return { msg: "You left the group successfully" };
     }else{
       console.log(err)

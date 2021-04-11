@@ -68,9 +68,9 @@ router.get("/getTotalGet", (req, res) => {
       for (i = 0; i < result.length; i++) {
         for (j = 0; j < result[i].ower.length; j++) {
           if (result[i].ower[j].is_settled == false) {
-            console.log(result[i].description)
-            console.log(result[i].ower[j].u_id.name)
-            console.log(result[i].ower[j].amount)
+            // console.log(result[i].description)
+            // console.log(result[i].ower[j].u_id.name)
+            // console.log(result[i].ower[j].amount)
 
             payerAmountDetails.GetBackAmount += result[i].ower[j].amount;
           }

@@ -118,19 +118,21 @@ class CreateGroup extends Component {
       userid.push(this.state.userDetails[i].id);
     }
     let currentUser =  JSON.parse(localStorage.getItem("user"))?.u_id
+    console.log(currentUser)
     userid.push(currentUser)
 
     let groupData = {
       g_name: this.state.groupname,
       users: userid,
     };
-
+    console.log(groupData)
     axiosInstance.defaults.withCredentials = true;
     const response = axiosInstance
       .post("/creategroup", groupData, {
         headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
       })
       .then((response) => {
+        console.log("success")
         this.setState({
           groupCreatedMessage: response.data.msg,
           groupCreateFlag: true,
@@ -139,6 +141,7 @@ class CreateGroup extends Component {
       })
       .catch((err) => {
         if (err.response.status === 400) {
+          console.log(err.response)
           this.setState({
             errorMessage: "Group Already exists with the same name",
             errorFlag: true,

@@ -9,6 +9,8 @@ import Group from "./Group";
 import { Redirect } from "react-router";
 import { Alert } from "react-bootstrap";
 import axiosInstance from "../helpers/axios"
+import { connect } from "react-redux";
+import {MyGroupsAction} from "../redux/mygroups/MyGroupsAction"
 
 class MyGroup extends Component {
   constructor(props) {
@@ -28,56 +30,69 @@ class MyGroup extends Component {
       successMessage: "",
     };
   }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.myGroupsProps !== this.props.myGroupsProps) {
+      if(this.props.myGroupsProps.joinedGroups){
+        this.setState({
+          groupNames: this.props.myGroupsProps.joinedGroups.groupNames,
+        })
+      }
+      if(this.props.myGroupsProps.invitedGroups)
+      {
+        this.setState({
+          invitedGroups: this.props.myGroupsProps.invitedGroups.invitedGroups
+        })
+      }
+      if(this.props.myGroupsProps.joinedGroupNamesObj){
+        this.setState({
+          joinedGroupNames: this.props.myGroupsProps.joinedGroupNamesObj.joinedGroupNames
+        })
+      }
+      if(this.props.myGroupsProps.names){
+        this.joinedGroup();
+        this.getInvitedGroups();
+        this.setState({
+          joinedGroupNames: []
+        })
+      }
+     
+    }
+  }
+
   componentDidMount() {
     this.getInvitedGroups();
     this.joinedGroup();
   }
   joinedGroup = () => {
-    axiosInstance.defaults.withCredentials = true;
-    const response = axiosInstance
-      .get(
-        "/mygroups/joined",
-        {
-          headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
-        }
-      )
-      .then((response) => {
-        this.setState({
-          groupNames: response.data,
-        });
-      });
+    this.props.getJoinedGroups()
+
+    
   };
   getInvitedGroups = () => {
-    axiosInstance.defaults.withCredentials = true;
-    const response = axiosInstance
-      .get(
-        "/mygroups/invites",
-        {
-          headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
-        }
-      )
-      .then((response) => {
-        this.setState({
-          invitedGroups: response.data,
-        });
-      });
+    this.props.getInvitedGroups()
+
+    
   };
   getGroups = () => {
-    axiosInstance.defaults.withCredentials = true;
     let typedGroupName = { g_name: this.state.typedSearchGroupName };
-    const response = axiosInstance
-      .post(
-        "/mygroups/getGroups",
-        typedGroupName,
-        {
-          headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
-        }
-      )
-      .then((response) => {
-        this.setState({
-          joinedGroupNames: response.data,
-        });
-      });
+    this.props.getGroups(typedGroupName)
+
+    // axiosInstance.defaults.withCredentials = true;
+    // let typedGroupName = { g_name: this.state.typedSearchGroupName };
+    // const response = axiosInstance
+    //   .post(
+    //     "/mygroups/getGroups",
+    //     typedGroupName,
+    //     {
+    //       headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
+    //     }
+    //   )
+    //   .then((response) => {
+    //     this.setState({
+    //       joinedGroupNames: response.data,
+    //     });
+    //   });
   };
   handleInputGroupNameChange = () => {
     this.setState(
@@ -112,24 +127,26 @@ class MyGroup extends Component {
       joinGroupFlag: true,
       successMessage: "Group Joined Successfully!!",
     });
-    axiosInstance.defaults.withCredentials = true;
-    const response = axiosInstance
-      .put(
-        "/mygroups/" +
-          idvalue +
-          "/accept",
-        null,
-        {
-          headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
-        }
-      )
-      .then((response) => {
-        this.joinedGroup();
-        this.getInvitedGroups();
-        this.setState({
-          joinedGroupNames: [],
-        });
-      });
+    this.props.joinGroup(idvalue)
+
+    // axiosInstance.defaults.withCredentials = true;
+    // const response = axiosInstance
+    //   .put(
+    //     "/mygroups/" +
+    //       idvalue +
+    //       "/accept",
+    //     null,
+    //     {
+    //       headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
+    //     }
+    //   )
+    //   .then((response) => {
+    //     this.joinedGroup();
+    //     this.getInvitedGroups();
+    //     this.setState({
+    //       joinedGroupNames: [],
+    //     });
+    //   });
     this.joinedGroup();
   };
   setRedirect = (e, value) => {
@@ -294,4 +311,16 @@ class MyGroup extends Component {
   }
 }
 
-export default MyGroup;
+const mapStateToProps = (state, props) => {
+  return {
+    myGroupsProps: state.myGroupsState,
+  };
+};
+
+const actionCreators = {
+  getJoinedGroups: MyGroupsAction.joinedGroups,
+  getInvitedGroups: MyGroupsAction.invitedGroups,
+  getGroups: MyGroupsAction.getGroups,
+  joinGroup : MyGroupsAction.joinGroup
+};
+export default connect(mapStateToProps, actionCreators)(MyGroup);

@@ -32,7 +32,6 @@ export function profileReducer(state = initialState, action) {
       };
 
     default:
-      console.log("default reducer s");
       return state;
   }
 }

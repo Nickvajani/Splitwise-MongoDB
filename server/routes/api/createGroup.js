@@ -55,7 +55,7 @@ router.post("/", (req, res) => {
     };
     members.push(userData);
   });
-  console.log(members);
+  // console.log(members);
 
   const newGroup = new Group({
     g_name: req.body.g_name,
@@ -67,10 +67,12 @@ router.post("/", (req, res) => {
       res.end();
     }
     if (result) {
-      res.status(500).json({ msg: "group already exists" });
+      console.log("group Found with same name")
+      res.status(400).json({ msg: "group already exists" });
     } else {
       newGroup.save((err, result) => {
         if (err) {
+          console.log("cannot create group")
           res.status(500).send(err);
         } else {
           res.status(200).json({ msg: "Group Created successfully" });
