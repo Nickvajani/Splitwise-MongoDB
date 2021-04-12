@@ -1,9 +1,11 @@
 import React, { Component } from "react";
 import { Button, Container, Row, Col } from "react-bootstrap";
 import axios from "axios";
-import Dropdown from 'react-bootstrap/Dropdown'
-import DropdownButton from 'react-bootstrap/DropdownButton'
-import axiosInstance from "../helpers/axios"
+import Dropdown from "react-bootstrap/Dropdown";
+import DropdownButton from "react-bootstrap/DropdownButton";
+import axiosInstance from "../helpers/axios";
+import { connect } from "react-redux";
+import { RecentActivityAction } from "../redux/recentActivity/RecentActivityAction";
 
 class RecentActivity extends Component {
   constructor(props) {
@@ -13,37 +15,50 @@ class RecentActivity extends Component {
       recentActivityDetails: [],
     };
   }
-  getCurrentUserDetails = async () => {
-    axiosInstance.defaults.withCredentials = true;
-    const response1 = await axiosInstance
-      .get(
-        "/groups/userDetails",
-        {
-          headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
-        }
-      )
-      .then((response) => {
-        console.log(response.data);
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.recentActivityProps !== this.props.recentActivityProps) {
+      if (this.props.recentActivityProps.user) {
         this.setState({
-          userDefaultCurrency: response.data.default_currency,
+          userDefaultCurrency: this.props.recentActivityProps.user
+            .userDefaultCurrency,
         });
-      });
+      }
+      if (this.props.recentActivityProps.recentActivity) {
+        this.setState({
+                   recentActivityDetails: this.props.recentActivityProps.recentActivity.recentActivityDetails,
+
+        });
+      }
+    }
+  }
+  getCurrentUserDetails = async () => {
+    this.props.getUserDetails()
+    // axiosInstance.defaults.withCredentials = true;
+    // const response1 = await axiosInstance
+    //   .get("/groups/userDetails", {
+    //     headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
+    //   })
+    //   .then((response) => {
+    //     console.log(response.data);
+    //     this.setState({
+    //       userDefaultCurrency: response.data.default_currency,
+    //     });
+    //   });
   };
   getRecentActivity = async () => {
-    axiosInstance.defaults.withCredentials = true;
-    const response1 = await axiosInstance
-      .get(
-        "/recentActivity",
-        {
-          headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
-        }
-      )
-      .then((response) => {
-        console.log(response.data);
-        this.setState({
-          recentActivityDetails: response.data,
-        });
-      });
+this.props.getRecentActivityDetails();
+    // axiosInstance.defaults.withCredentials = true;
+    // const response1 = await axiosInstance
+    //   .get("/recentActivity", {
+    //     headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
+    //   })
+    //   .then((response) => {
+    //     console.log(response.data);
+    //     this.setState({
+    //       recentActivityDetails: response.data,
+    //     });
+    //   });
   };
 
   async componentDidMount() {
@@ -55,12 +70,11 @@ class RecentActivity extends Component {
       let amount = parseFloat(value);
       if (amount >= 1) {
         return ` You Owe ${this.state.userDefaultCurrency}${amount}`;
-      } else if(amount<0){
+      } else if (amount < 0) {
         let newAmount = amount * -1;
         return `You Get back ${this.state.userDefaultCurrency}${newAmount}`;
-      }else{
+      } else {
         return ` This transaction is settled`;
-
       }
     };
     let checkName = (value) => {
@@ -86,63 +100,58 @@ class RecentActivity extends Component {
                 </Button>
               </Row>
             </Col>
-            <Col  xs="3" style={{ backgroundColor: "lightgray" }}>
+            <Col xs="3" style={{ backgroundColor: "lightgray" }}>
               <h3>Recent Activity</h3>
-              
             </Col>
             <Col xs="1" style={{ backgroundColor: "lightgray" }}>
-            Filter by{" "}
+              Filter by{" "}
             </Col>
-            <Col xs="2"style={{ backgroundColor: "lightgray" }}> 
-              <DropdownButton
-                id="dropdown-basic-button"
-                title="Groups"
-              >
-                <Dropdown.Item >Farewell Party</Dropdown.Item>
-                <Dropdown.Item >Another action</Dropdown.Item>
-                <Dropdown.Item >Something else</Dropdown.Item>
+            <Col xs="2" style={{ backgroundColor: "lightgray" }}>
+              <DropdownButton id="dropdown-basic-button" title="Groups">
+                <Dropdown.Item>Farewell Party</Dropdown.Item>
+                <Dropdown.Item>Another action</Dropdown.Item>
+                <Dropdown.Item>Something else</Dropdown.Item>
               </DropdownButton>
             </Col>
             <Col xs="1" style={{ backgroundColor: "lightgray" }}>
-            Sort by{" "}
+              Sort by{" "}
             </Col>
-            <Col xs="3"style={{ backgroundColor: "lightgray" }}> 
+            <Col xs="3" style={{ backgroundColor: "lightgray" }}>
               <DropdownButton
                 id="dropdown-basic-button"
                 title="Most recent on top"
               >
-                <Dropdown.Item >Farewell Party</Dropdown.Item>
-                <Dropdown.Item >Another action</Dropdown.Item>
-                <Dropdown.Item >Something else</Dropdown.Item>
+                <Dropdown.Item>Farewell Party</Dropdown.Item>
+                <Dropdown.Item>Another action</Dropdown.Item>
+                <Dropdown.Item>Something else</Dropdown.Item>
               </DropdownButton>
             </Col>
-            
           </Row>
           <Row>
             <Col xs="2"></Col>
             <Col style={{ textAlign: "left" }}>
-              {this.state.recentActivityDetails.length>0 &&
-              this.state.recentActivityDetails.map((group, index) => (
-                <div key={index}>
-                  <Row
-                    xs="10"
-                    style={{ border: "1px solid rgba(0, 0, 0, 0.09)" }}
-                  >
-                    <Col style={{ textTransform: "capitalize" }}>
-                      <small>
-                        <b>{checkName(group.payerName)}</b> added{" "}
-                        <b>"{group.description}"</b> in{" "}
-                        <b>"{group.groupName}"</b>
-                        <br></br>
-                      </small>
-                      <p style={{ color: "red" }}>
-                        {" "}
-                        <small>{amountCheck(group.amount)}</small>
-                      </p>
-                    </Col>
-                  </Row>
-                </div>
-              ))}
+              {this.state.recentActivityDetails.length > 0 &&
+                this.state.recentActivityDetails.map((group, index) => (
+                  <div key={index}>
+                    <Row
+                      xs="10"
+                      style={{ border: "1px solid rgba(0, 0, 0, 0.09)" }}
+                    >
+                      <Col style={{ textTransform: "capitalize" }}>
+                        <small>
+                          <b>{checkName(group.payerName)}</b> added{" "}
+                          <b>"{group.description}"</b> in{" "}
+                          <b>"{group.groupName}"</b>
+                          <br></br>
+                        </small>
+                        <p style={{ color: "red" }}>
+                          {" "}
+                          <small>{amountCheck(group.amount)}</small>
+                        </p>
+                      </Col>
+                    </Row>
+                  </div>
+                ))}
             </Col>
           </Row>
         </Container>
@@ -151,4 +160,14 @@ class RecentActivity extends Component {
   }
 }
 
-export default RecentActivity;
+const mapStateToProps = (state, props) => {
+  return {
+    recentActivityProps: state.recentActivityState,
+  };
+};
+
+const actionCreators = {
+  getUserDetails: RecentActivityAction.currentUserDetails,
+  getRecentActivityDetails: RecentActivityAction.getRecentActivity
+};
+export default connect(mapStateToProps, actionCreators)(RecentActivity);

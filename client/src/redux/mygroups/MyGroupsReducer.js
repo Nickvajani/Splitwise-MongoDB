@@ -10,7 +10,9 @@ export function myGroupsReducer(state = [], action) {
       };
     case myGroupsConstants.JOINEDGROUPS_FAILURE:
       return state;
-    case myGroupsConstants.INVITES_REQUEST:
+    
+    
+      case myGroupsConstants.INVITES_REQUEST:
       return state;
     case myGroupsConstants.INVITES_SUCCESS:
       return {
@@ -19,7 +21,9 @@ export function myGroupsReducer(state = [], action) {
     case myGroupsConstants.INVITES_FAILURE:
       return state;
 
-    case myGroupsConstants.GETGROUPS_REQUEST:
+   
+   
+      case myGroupsConstants.GETGROUPS_REQUEST:
       return state;
     case myGroupsConstants.GETGROUPS_SUCCESS:
       return {
@@ -28,16 +32,30 @@ export function myGroupsReducer(state = [], action) {
     case myGroupsConstants.GETGROUPS_FAILURE:
       return state;
 
-    case myGroupsConstants.JOINGROUP_REQUEST:
+    
+    
+      case myGroupsConstants.JOINGROUP_REQUEST:
       return state;
     case myGroupsConstants.JOINGROUP_SUCCESS:
       return {
         names: action.names,
-      }
+      };
     case myGroupsConstants.JOINGROUP_FAILURE:
       return state;
 
-    default:
+   
+   
+      case myGroupsConstants.LEAVEGROUP_REQUEST:
+      return state;
+    case myGroupsConstants.LEAVEGROUP_SUCCESS:
+      return {
+        leaveGroupFlag: true,
+      };
+    case myGroupsConstants.LEAVEGROUP_FAILURE:
+      return { errorFlag: true };
+   
+   
+      default:
       return state;
   }
 }

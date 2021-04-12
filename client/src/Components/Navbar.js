@@ -35,10 +35,10 @@ class Navbar extends Component {
   }
   
   render() {
-    const { redirect } = this.state;
-    if (redirect) {
-      return <Redirect to="/login"></Redirect>;
-    }
+    // const { redirect } = this.state;
+    // if (redirect) {
+    //   return <Redirect to="/login"></Redirect>;
+    // }
 
     let currentUser = JSON.parse(localStorage.getItem("user"))?.username
 
@@ -82,7 +82,7 @@ class Navbar extends Component {
               <Dropdown.Item href="./recentactivity">
                 Recent Activity
               </Dropdown.Item>
-              <Dropdown.Item onClick={this.logout.bind(this)}>
+              <Dropdown.Item href="./login" onClick={this.logout.bind(this)}>
                 Logout
               </Dropdown.Item>
             </DropdownButton>

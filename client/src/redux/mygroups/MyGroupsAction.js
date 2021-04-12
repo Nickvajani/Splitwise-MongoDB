@@ -101,13 +101,13 @@ function joinGroup(idvalue) {
     return { type: myGroupsConstants.JOINGROUP_FAILURE, error };
   }
 }
-function leaveGroup(idvalue) {
+function leaveGroup(data) {
     return (dispatch) => {
       dispatch(request());
   
-      myGroupsService.joinGroup(idvalue).then(
-        (names) => {
-          dispatch(success(names));
+      myGroupsService.leaveGroup(data).then(
+        (user) => {
+          dispatch(success());
         },
         (error) => {
           dispatch(failure(error.toString()));
@@ -115,13 +115,13 @@ function leaveGroup(idvalue) {
       );
     };
     function request() {
-      return { type: myGroupsConstants.JOINGROUP_REQUEST };
+      return { type: myGroupsConstants.LEAVEGROUP_REQUEST };
     }
-    function success(names) {
-      return { type: myGroupsConstants.JOINGROUP_SUCCESS, names };
+    function success() {
+      return { type: myGroupsConstants.LEAVEGROUP_SUCCESS };
     }
     function failure(error) {
-      return { type: myGroupsConstants.JOINGROUP_FAILURE, error };
+      return { type: myGroupsConstants.LEAVEGROUP_FAILURE, error };
     }
   }
   

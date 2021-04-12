@@ -91,7 +91,7 @@ router.post("/getPerson", (req, res) => {
   })
     .populate({ path: "payer_id" })
     .then((result) => {
-      console.log(result);
+      // console.log(result);
       let dbPersonNames = [];
       for (let i = 0; i < result.length; i++) {
         let personNamesObj = {
@@ -100,7 +100,7 @@ router.post("/getPerson", (req, res) => {
         };
         dbPersonNames.push(personNamesObj);
       }
-      console.log(dbPersonNames);
+      // console.log(dbPersonNames);
       const uniqueArray = dbPersonNames.filter((thing, index) => {
         const _thing = JSON.stringify(thing);
         return (
@@ -116,7 +116,7 @@ router.post("/getPerson", (req, res) => {
 
 router.post("/settle", async (req, res) => {
   var current_user = req.header("user");
-  
+  // console.log("in settle")
   let TransactionId = await new Promise((resolve, reject) => {
     Transaction.find({ payer_id: req.body.payer_id, g_id: req.body.g_id }, (err, result) => {
       if (err) {

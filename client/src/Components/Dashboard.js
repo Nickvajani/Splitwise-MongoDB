@@ -4,8 +4,9 @@ import { Redirect } from "react-router";
 import axios from "axios";
 import { Form, Modal } from "react-bootstrap";
 import DashboardSuggestions from "./DashboardSuggestions";
-import axiosInstance from "../helpers/axios"
-
+import axiosInstance from "../helpers/axios";
+import { connect } from "react-redux";
+import { DashboardAction } from "../redux/dashboard/dashboardAction";
 
 class Dashboard extends Component {
   constructor(props) {
@@ -28,12 +29,74 @@ class Dashboard extends Component {
       settlePersonResults: [],
       settlePersonToBePassed: "",
       settlePersonIdToBePassed: "",
-      insertMessage:'',
+      insertMessage: "",
       errorFlag: false,
-      errorMessage:'',
-      settleFlag: true
-
+      errorMessage: "",
+      settleFlag: true,
     };
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.dashboardProps !== this.props.dashboardProps) {
+      if (this.props.dashboardProps.user) {
+        this.setState({
+          userDefaultCurrency: this.props.dashboardProps.user
+            .userDefaultCurrency,
+        });
+      }
+      if (this.props.dashboardProps.userOwe) {
+        this.setState({
+          userTotalOwe: this.props.dashboardProps.userOwe.userTotalOwe,
+        });
+      }
+      if (this.props.dashboardProps.userGet) {
+        this.setState(
+          {
+            userTotalGet: this.props.dashboardProps.userGet.userTotalGet,
+          },
+          () => {
+            this.getUserTotal();
+          }
+        );
+      }
+
+      if (this.props.dashboardProps.groupNames) {
+        this.setState({
+          settleGroupNameResults: this.props.dashboardProps.groupNames
+            .settleGroupNameResults,
+        });
+      }
+
+      if (this.props.dashboardProps.personNames) {
+        this.setState({
+          settlePersonResults: this.props.dashboardProps.personNames
+            .settlePersonResults,
+        });
+      }
+      if (this.props.dashboardProps.settledFlag) {
+        this.setState({
+          insertMessage: this.props.dashboardProps.settle.insertMessage,
+          show: false,
+          settleGroupNameResults: [],
+          settlePersonResults: [],
+          settleFlag: true,
+        },async()=>{
+          const r1 = await this.getCurrentUserDetails();
+    const r2 = await this.getNumberOfGroups();
+    const r3 = await this.getUserOweAmount();
+    const r4 = await this.getUserGetBackAmount();
+    const r5 = await this.getUserTotal();
+        });
+      }
+      if (this.props.dashboardProps.notSettledFlag) {
+        this.setState({
+          errorMessage: "Not able to Settle",
+              errorFlag: true,
+              settleGroupNameResults: [],
+              settlePersonResults: []
+        });
+      }
+    }
   }
   getNumberOfGroups = async () => {
     axiosInstance.defaults.withCredentials = true;
@@ -47,15 +110,15 @@ class Dashboard extends Component {
             numberOfGroups: response.data,
           },
           () => {
-            console.log(this.state.numberOfGroups)
+            console.log(this.state.numberOfGroups);
           }
         );
       });
 
     for (let i = 0; i < this.state.numberOfGroups.length; i++) {
-     let names = await this.getGroupNames(this.state.numberOfGroups[i]);
+      let names = await this.getGroupNames(this.state.numberOfGroups[i]);
     }
-    console.log(this.state.groupNames)
+    console.log(this.state.groupNames);
     let arr = [];
     for (let i = 0; i < this.state.numberOfGroups.length; i++) {
       let s = await this.getGroupDetails(this.state.numberOfGroups[i]);
@@ -105,46 +168,16 @@ class Dashboard extends Component {
     return response4;
   };
   getCurrentUserDetails = async () => {
-    axiosInstance.defaults.withCredentials = true;
-    const response1 = await axiosInstance
-      .get("/groups/userDetails", {
-        headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
-      })
-      .then((response) => {
-        // console.log(response.data);
-        this.setState({
-          userDefaultCurrency: response.data.default_currency,
-        });
-      });
+    this.props.getUserDetails();
   };
   getUserOweAmount = async () => {
-    axiosInstance.defaults.withCredentials = true;
-    const response1 = await axiosInstance
-      .get("/dashboard/getTotalOwe", {
-        headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
-      })
-      .then((response) => {
-        //   console.log(response);
-        this.setState({
-          userTotalOwe: response.data.owedAmount,
-        });
-      });
+    this.props.getUserOweAmount();
   };
   getUserGetBackAmount = async () => {
-    axiosInstance.defaults.withCredentials = true;
-    const response1 = await axiosInstance
-      .get("/dashboard/getTotalGet", {
-        headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
-      })
-      .then((response) => {
-          console.log(response);
-        this.setState({
-          userTotalGet: response.data.GetBackAmount,
-        });
-      });
+    this.props.getUserGetBackAmount();
   };
   getUserTotal = () => {
-   
+    console.log("haha");
     let x = this.state.userTotalGet - this.state.userTotalOwe;
     this.setState({
       userTotalAmount: x,
@@ -155,7 +188,7 @@ class Dashboard extends Component {
     const r2 = await this.getNumberOfGroups();
     const r3 = await this.getUserOweAmount();
     const r4 = await this.getUserGetBackAmount();
-    const r5 = await this.getUserTotal();
+    // const r5 = await this.getUserTotal();
 
     //  this.dispGroupDetails();
     // this.getGroupNames();
@@ -172,82 +205,83 @@ class Dashboard extends Component {
     });
   };
 
-  getGroups = async() => {
-    axiosInstance.defaults.withCredentials = true;
+  getGroups = async () => {
     let typedGroupName = { g_name: this.state.settleGroupName };
-    // console.log("groupname "+this.state.settleGroupName)
+    this.props.getSettlegroups(typedGroupName);
     this.setState({
-      settleFlag: true
-    })
-    const response = await axiosInstance
-      .post("/mygroups/getGroups", typedGroupName, {
-        headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
-      })
-      .then((response) => {
-      
-        this.setState({
-          settleGroupNameResults: response.data,
-        },() =>{console.log(this.state.settleGroupNameResults)});
-      });
+      settleFlag: true,
+    });
+    // axiosInstance.defaults.withCredentials = true;
+    // // console.log("groupname "+this.state.settleGroupName)
+    // const response = await axiosInstance
+    //   .post("/mygroups/getGroups", typedGroupName, {
+    //     headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
+    //   })
+    //   .then((response) => {
+
+    //     this.setState({
+    //       settleGroupNameResults: response.data,
+    //     },() =>{console.log(this.state.settleGroupNameResults)});
+    //   });
   };
-  getPerson = async() => {
-    axiosInstance.defaults.withCredentials = true;
+  getPerson = async () => {
     let typedPersonName = {
       name: this.state.settlePerson,
       g_id: this.state.settleGroupIdToBePassed,
     };
-    console.log(typedPersonName)
+    this.props.getSettlePerson(typedPersonName);
     this.setState({
-      settleFlag: true
-    })
-   await axiosInstance
-      .post("/dashboard/getPerson", typedPersonName, {
-        headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
-      })
-      .then((response) => {
-        this.setState(
-          {
-            settlePersonResults: response.data,
-          },
-          () => {
-            console.log(this.state.settlePersonResults);
-          }
-        );
-      });
+      settleFlag: true,
+    });
+    //   axiosInstance.defaults.withCredentials = true;
+    //  await axiosInstance
+    //     .post("/dashboard/getPerson", typedPersonName, {
+    //       headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
+    //     })
+    //     .then((response) => {
+    //       this.setState(
+    //         {
+    //           settlePersonResults: response.data,
+    //         },
+    //         () => {
+    //           console.log(this.state.settlePersonResults);
+    //         }
+    //       );
+    //     });
   };
   handleGroupNameChange = () => {
     this.setState(
       {
         settleGroupName: this.search.value,
       },
-      async() => {
+      async () => {
         if (this.state.settleGroupName.length == "")
           this.setState({ settleGroupNameResults: [] });
         if (
           this.state.settleGroupName &&
           this.state.settleGroupName.length >= 1
         ) {
-         let c = await this.getGroups();
+          let c = await this.getGroups();
         }
 
         //store only when the suggested list length is 1
         if (this.state.settleGroupNameResults.length == 1) {
           //check whether the last suggested name and entered name are same then set state for final values
-      
+
           if (
             this.state.settleGroupName ==
             this.state.settleGroupNameResults[0].name
-          ) { 
+          ) {
             this.setState(
               {
                 settleGroupIdToBePassed: this.state.settleGroupNameResults[0]
                   .g_id,
                 settleGroupNameToBePassed: this.state.settleGroupNameResults[0]
                   .name,
-                settleGroupNameResults: []
+                settleGroupNameResults: [],
               },
               () => {
-                console.log(this.state.settleGroupIdToBePassed)
+                console.log(this.state.settleGroupIdToBePassed);
               }
             );
           }
@@ -260,14 +294,14 @@ class Dashboard extends Component {
       {
         settlePerson: this.search2.value,
       },
-      async() => {
+      async () => {
         if (this.state.settlePerson.length == "")
           this.setState({ settlePersonResults: [] });
         if (this.state.settlePerson && this.state.settlePerson.length >= 1) {
           let c = await this.getPerson();
         }
 
-        for(let i=0;i<this.state.settlePersonResults.length;i++){
+        for (let i = 0; i < this.state.settlePersonResults.length; i++) {
           if (
             this.state.settlePerson == this.state.settlePersonResults[i].name
           ) {
@@ -276,73 +310,76 @@ class Dashboard extends Component {
                 settlePersonToBePassed: this.state.settlePersonResults[i].name,
                 settlePersonIdToBePassed: this.state.settlePersonResults[i]
                   .payer_id,
-                  settleFlag: false,
-                  settlePersonResults: []
+                settleFlag: false,
+                settlePersonResults: [],
               },
               () => {
                 console.log(this.state.settlePersonIdToBePassed);
               }
             );
           }
-
         }
-       
       }
     );
   };
 
   handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("in submit")
-  
+    console.log("in submit");
+
     // if (
     //   this.state.settleGroupIdToBePassed.length >= 1 &&
     //   this.state.settlePersonIdToBePassed.length >= 1
-    // ) 
-      let data = {
-        payer_id: this.state.settlePersonIdToBePassed,
-        g_id: this.state.settleGroupIdToBePassed,
-      };
-      console.log(data)
-      if (Object.values(data).length == 2) {
-          axiosInstance.post("/dashboard/settle", data, {
-          headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
-        }).then((response) => {
-            if (response.status === 200) {
-              this.setState({
-                insertMessage: response.data.msg,
-                show: false,
-                settleGroupNameResults: [],
-                settlePersonResults: [],
-                settleFlag: true
-              },() => {console.log(this.state.show)});
-            }
-            
-          }).catch((err) => {
-            console.log(err);
-            if (err.response.status === 400) {
-              this.setState({
-                errorMessage: err.response.data.msg,
-                errorFlag: true,
-                settleGroupNameResults: [],
-                settlePersonResults: []
-              });
-            }
-          });
-      }
-      const r1 = await this.getCurrentUserDetails();
-      const r2 = await this.getNumberOfGroups();
-      const r3 = await this.getUserOweAmount();
-      const r4 = await this.getUserGetBackAmount();
-      const r5 = await this.getUserTotal();
-    
+    // )
+    let data = {
+      payer_id: this.state.settlePersonIdToBePassed,
+      g_id: this.state.settleGroupIdToBePassed,
+    };
+    console.log(data);
+
+    if (Object.values(data).length == 2) {
+      this.props.settle(data);
+      //   axiosInstance.post("/dashboard/settle", data, {
+      //   headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
+      // }).then((response) => {
+      //     if (response.status === 200) {
+      //       this.setState({
+      //         insertMessage: response.data.msg,
+      //         show: false,
+      //         settleGroupNameResults: [],
+      //         settlePersonResults: [],
+      //         settleFlag: true
+      //       },() => {console.log(this.state.show)});
+      //     }
+
+      //   }).catch((err) => {
+      //     console.log(err);
+      //     if (err.response.status === 400) {
+      //       this.setState({
+      //         errorMessage: err.response.data.msg,
+      //         errorFlag: true,
+      //         settleGroupNameResults: [],
+      //         settlePersonResults: []
+      //       });
+      //     }
+      //   });
+    }
+    // const r1 = await this.getCurrentUserDetails();
+    // const r2 = await this.getNumberOfGroups();
+    // const r3 = await this.getUserOweAmount();
+    // const r4 = await this.getUserGetBackAmount();
+    // const r5 = await this.getUserTotal();
   };
 
   render() {
-    if(!JSON.parse(localStorage.getItem("user"))){
-      return <Redirect to={{
-        pathname: '/login',
-    }}></Redirect>
+    if (!JSON.parse(localStorage.getItem("user"))) {
+      return (
+        <Redirect
+          to={{
+            pathname: "/login",
+          }}
+        ></Redirect>
+      );
     }
     //   console.log(this.state.groupDetails)
     const UserStyle = {
@@ -351,7 +388,7 @@ class Dashboard extends Component {
     };
     let amountCheck = (value) => {
       let amount = parseFloat(value);
-      if (amount > 1) {
+      if (amount >=1) {
         return ` Owe ${this.state.userDefaultCurrency} ${amount}`;
       } else {
         let newAmount = amount * -1;
@@ -475,34 +512,35 @@ class Dashboard extends Component {
             >
               <p>Details about each group</p>
 
-              {this.state.groupDetails.length>0 &&
-              this.state.groupDetails.map((group, index) => (
-                <div key={index}>
-                  <Row>
-                    <Col
-                      xs="10"
-                      style={
-                        ({ fontFamily: "italic" },
-                        { textTransform: "uppercase" })
-                      }
-                    >
-                      <b>{Object.keys(group)[0]}</b>
-                      <br></br>
-                    </Col>
-                    <Col xs="4">
-                      {group[Object.keys(group)[0]] && group[Object.keys(group)[0]].map((detail, index) => (
-                        <Row
-                          key={index}
-                          style={{ textTransform: "capitalize" }}
-                        >
-                          {nameCheck(detail.name)}
-                          {amountCheck(detail.amount_owed)}
-                        </Row>
-                      ))}
-                    </Col>
-                  </Row>
-                </div>
-              ))}
+              {this.state.groupDetails.length > 0 &&
+                this.state.groupDetails.map((group, index) => (
+                  <div key={index}>
+                    <Row>
+                      <Col
+                        xs="10"
+                        style={
+                          ({ fontFamily: "italic" },
+                          { textTransform: "uppercase" })
+                        }
+                      >
+                        <b>{Object.keys(group)[0]}</b>
+                        <br></br>
+                      </Col>
+                      <Col xs="4">
+                        {group[Object.keys(group)[0]] &&
+                          group[Object.keys(group)[0]].map((detail, index) => (
+                            <Row
+                              key={index}
+                              style={{ textTransform: "capitalize" }}
+                            >
+                              {nameCheck(detail.name)}
+                              {amountCheck(detail.amount_owed)}
+                            </Row>
+                          ))}
+                      </Col>
+                    </Row>
+                  </div>
+                ))}
             </Col>
           </Row>
         </Container>
@@ -511,4 +549,18 @@ class Dashboard extends Component {
   }
 }
 
-export default Dashboard;
+const mapStateToProps = (state, props) => {
+  return {
+    dashboardProps: state.dashboardState,
+  };
+};
+
+const actionCreators = {
+  getUserDetails: DashboardAction.currentUserDetails,
+  getUserOweAmount: DashboardAction.getUserOweDetails,
+  getUserGetBackAmount: DashboardAction.getUserGetBackDetails,
+  getSettlegroups: DashboardAction.getGroupForSettle,
+  getSettlePerson: DashboardAction.getPersonForSettle,
+  settle: DashboardAction.settle,
+};
+export default connect(mapStateToProps, actionCreators)(Dashboard);

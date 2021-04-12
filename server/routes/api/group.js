@@ -4,7 +4,6 @@ const router = express.Router();
 let User = require("../../models/userModel");
 let Group = require("../../models/createGroupModel");
 let Transaction = require("../../models/transactionModel");
-const { resolve } = require("path");
 
 router.get("/userDetails", (req, res) => {
   var current_user = req.header("user");
@@ -26,7 +25,6 @@ router.get("/groupDetails", (req, res) => {
     if (err) {
       res.status(500).json({ msg: err });
     } else {
-      console.log(result[0].g_name);
       res.status(200).send(result[0].g_name);
     }
   });
@@ -42,6 +40,7 @@ router.get("/expenses", (req, res) => {
       let group_details = [];
       for (let i = 0; i < user.length; i++) {
         let obj = {
+          ID: user[i]._id,
           amount: user[i].amount,
           payer_name: user[i].payer_id.name,
           description: user[i].description,
@@ -49,6 +48,7 @@ router.get("/expenses", (req, res) => {
         };
         group_details.push(obj);
       }
+      console.log(group_details)
       res.send(group_details);
     });
 });
@@ -73,7 +73,7 @@ router.get("/owe", async (req, res) => {
         }
       });
     });
-    console.log(memberList);
+    // console.log(memberList);
     let totalAmounts = []; //contains each member ower amount
     for (z = 0; z < memberList.length; z++) {
       let owersObj = await new Promise((resolve, reject) => {
@@ -115,7 +115,7 @@ router.get("/owe", async (req, res) => {
       }
     }
     // console.log("Owe details")
-    console.log(totalAmounts);
+    // console.log(totalAmounts);
     //to find the users who are just the payers and do not owe anything
     let res4 = await new Promise(async (resolve, reject) => {
       let newMembers = [];
@@ -198,7 +198,7 @@ router.get("/owe", async (req, res) => {
       }
     }
     // console.log("payerAmount")
-    console.log(payerAmount);
+    // console.log(payerAmount);
     if (payerAmount != null && totalAmounts != null) {
       for (i = 0; i < totalAmounts.length; i++) {
         for (j = 0; j < payerAmount.length; j++) {
@@ -209,7 +209,7 @@ router.get("/owe", async (req, res) => {
         }
       }
     }
-    console.log(totalAmounts);
+    // console.log(totalAmounts);
     res.status(200).send(totalAmounts);
   } catch (error) {
     res.status(400).json({ msg: err });

@@ -28,15 +28,17 @@ router.get("/", async (req, res) => {
     let outerTransactions = [];
     await Promise.all(
       listOfGroupId.map(async (group) => {
-        const contents = await everyTransactionDetails(group, current_user);
-       console.log("from contents")
-        console.log(contents)
-        outerTransactions = [...outerTransactions, ...contents];
+        let contents = await everyTransactionDetails(group, current_user);
+        // await outerTransactions.concat(contents)
+        if(contents != null){
+          outerTransactions = [...outerTransactions, ...contents];
+        }
+        
       })
     );
-    console.log("outer")
-    console.log(outerTransactions)
-    res.send(outerTransactions);
+    // console.log("outer")
+    // console.log(outerTransactions)
+    res.status(200).send(outerTransactions);
   } catch (error) {}
   // Transaction.find({})
 });
@@ -100,6 +102,8 @@ const everyTransactionDetails = async (myGroupNo, current_user) => {
           }
         //   console.log(groupsTransactionDetails);
           resolve(groupsTransactionDetails)
+        }else{
+          resolve(null)
         }
 
       });

@@ -8,9 +8,9 @@ import Button from "react-bootstrap/Button";
 import Group from "./Group";
 import { Redirect } from "react-router";
 import { Alert } from "react-bootstrap";
-import axiosInstance from "../helpers/axios"
+import axiosInstance from "../helpers/axios";
 import { connect } from "react-redux";
-import {MyGroupsAction} from "../redux/mygroups/MyGroupsAction"
+import { MyGroupsAction } from "../redux/mygroups/MyGroupsAction";
 
 class MyGroup extends Component {
   constructor(props) {
@@ -33,30 +33,47 @@ class MyGroup extends Component {
 
   componentDidUpdate(prevProps) {
     if (prevProps.myGroupsProps !== this.props.myGroupsProps) {
-      if(this.props.myGroupsProps.joinedGroups){
+      if (this.props.myGroupsProps.joinedGroups) {
         this.setState({
           groupNames: this.props.myGroupsProps.joinedGroups.groupNames,
-        })
+        });
       }
-      if(this.props.myGroupsProps.invitedGroups)
-      {
+      if (this.props.myGroupsProps.invitedGroups) {
         this.setState({
-          invitedGroups: this.props.myGroupsProps.invitedGroups.invitedGroups
-        })
+          invitedGroups: this.props.myGroupsProps.invitedGroups.invitedGroups,
+        });
       }
-      if(this.props.myGroupsProps.joinedGroupNamesObj){
+      if (this.props.myGroupsProps.joinedGroupNamesObj) {
         this.setState({
-          joinedGroupNames: this.props.myGroupsProps.joinedGroupNamesObj.joinedGroupNames
-        })
+          joinedGroupNames: this.props.myGroupsProps.joinedGroupNamesObj
+            .joinedGroupNames,
+        });
       }
-      if(this.props.myGroupsProps.names){
+      if (this.props.myGroupsProps.names) {
         this.joinedGroup();
         this.getInvitedGroups();
         this.setState({
-          joinedGroupNames: []
-        })
+          joinedGroupNames: [],
+        });
       }
-     
+      if (this.props.myGroupsProps.leaveGroupFlag) {
+        this.setState({
+          successMessage: "Group left!!",
+          leaveGroupFlag: true,
+        });
+      }
+      if (this.props.myGroupsProps.errorFlag) {
+        this.setState(
+          {
+            errorMessage: "Please settle your pending balance in the group",
+            errorFlag: true,
+          },
+          () => {
+            this.getInvitedGroups();
+            this.joinedGroup();
+          }
+        );
+      }
     }
   }
 
@@ -65,18 +82,14 @@ class MyGroup extends Component {
     this.joinedGroup();
   }
   joinedGroup = () => {
-    this.props.getJoinedGroups()
-
-    
+    this.props.getJoinedGroups();
   };
   getInvitedGroups = () => {
-    this.props.getInvitedGroups()
-
-    
+    this.props.getInvitedGroups();
   };
   getGroups = () => {
     let typedGroupName = { g_name: this.state.typedSearchGroupName };
-    this.props.getGroups(typedGroupName)
+    this.props.getGroups(typedGroupName);
 
     // axiosInstance.defaults.withCredentials = true;
     // let typedGroupName = { g_name: this.state.typedSearchGroupName };
@@ -127,7 +140,7 @@ class MyGroup extends Component {
       joinGroupFlag: true,
       successMessage: "Group Joined Successfully!!",
     });
-    this.props.joinGroup(idvalue)
+    this.props.joinGroup(idvalue);
 
     // axiosInstance.defaults.withCredentials = true;
     // const response = axiosInstance
@@ -161,34 +174,34 @@ class MyGroup extends Component {
     let data = {
       g_id: value,
     };
-    axiosInstance.defaults.withCredentials = true;
-    const response = await axiosInstance
-      .delete(
-        "/mygroups/leave/" +
-          data.g_id,
-        {
-          headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
-        }
-      )
-      .then((response) => {
-        console.log(response.status);
-        console.log(response);
-        if (response.status == 204) {
-          console.log("inside");
-          this.setState({
-            errorMessage: "Please settle your pending balance in the group",
-            errorFlag: true,
-          });
-        } else if (response.status === 200) {
-          console.log("else if");
-          this.setState({
-            successMessage: "Group left!!",
-            leaveGroupFlag: true,
-          });
-        }
-      });
-    this.getInvitedGroups();
-    this.joinedGroup();
+    this.props.leaveGroup(data);
+
+    // axiosInstance.defaults.withCredentials = true;
+    // const response = await axiosInstance
+    //   .delete(
+    //     "/mygroups/leave/" +
+    //       data.g_id,
+    //     {
+    //       headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
+    //     }
+    //   )
+    //   .then((response) => {
+    //     console.log(response.status);
+    //     console.log(response);
+    //     if (response.status == 204) {
+    //       console.log("inside");
+    //       this.setState({
+    //         errorMessage: "Please settle your pending balance in the group",
+    //         errorFlag: true,
+    //       });
+    //     } else if (response.status === 200) {
+    //       console.log("else if");
+    //       this.setState({
+    //         successMessage: "Group left!!",
+    //         leaveGroupFlag: true,
+    //       });
+    //     }
+    //   });
   };
   renderRedirect = () => {
     if (this.state.redirect) {
@@ -249,25 +262,25 @@ class MyGroup extends Component {
         <Row>
           <Col>
             <h6>Groups in which you are invited</h6>
-            {this.state.invitedGroups.length>0 &&
-            this.state.invitedGroups.map((group, index) => (
-              <div key={index}>
-                <Row>
-                  <Col xs="7">{group.name}</Col>
+            {this.state.invitedGroups.length > 0 &&
+              this.state.invitedGroups.map((group, index) => (
+                <div key={index}>
+                  <Row>
+                    <Col xs="7">{group.name}</Col>
 
-                  <Col xs="2">
-                    <Button
-                      onClick={(e) => {
-                        this.joinGroup(e, group.g_id);
-                      }}
-                      size="sm"
-                    >
-                      Join
-                    </Button>
-                  </Col>
-                </Row>
-              </div>
-            ))}
+                    <Col xs="2">
+                      <Button
+                        onClick={(e) => {
+                          this.joinGroup(e, group.g_id);
+                        }}
+                        size="sm"
+                      >
+                        Join
+                      </Button>
+                    </Col>
+                  </Row>
+                </div>
+              ))}
           </Col>
           <Col></Col>
           <Col>
@@ -275,35 +288,35 @@ class MyGroup extends Component {
             {renderError()}
             {renderSuccess()}
 
-            {this.state.groupNames.length>0 &&
-            this.state.groupNames.map((group, index) => (
-              <div key={index}>
-                <Row>
-                  <Col xs="7">{group.name}</Col>
+            {this.state.groupNames.length > 0 &&
+              this.state.groupNames.map((group, index) => (
+                <div key={index}>
+                  <Row>
+                    <Col xs="7">{group.name}</Col>
 
-                  <Col xs="5">
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      onClick={(e) => {
-                        this.setRedirect(e, group.g_id);
-                      }}
-                    >
-                      Goto Group
-                    </Button>
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      onClick={(e) => {
-                        this.leaveGroup(e, group.g_id);
-                      }}
-                    >
-                      Leave Group
-                    </Button>
-                  </Col>
-                </Row>
-              </div>
-            ))}
+                    <Col xs="5">
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        onClick={(e) => {
+                          this.setRedirect(e, group.g_id);
+                        }}
+                      >
+                        Goto Group
+                      </Button>
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        onClick={(e) => {
+                          this.leaveGroup(e, group.g_id);
+                        }}
+                      >
+                        Leave Group
+                      </Button>
+                    </Col>
+                  </Row>
+                </div>
+              ))}
           </Col>
         </Row>
       </div>
@@ -321,6 +334,7 @@ const actionCreators = {
   getJoinedGroups: MyGroupsAction.joinedGroups,
   getInvitedGroups: MyGroupsAction.invitedGroups,
   getGroups: MyGroupsAction.getGroups,
-  joinGroup : MyGroupsAction.joinGroup
+  joinGroup: MyGroupsAction.joinGroup,
+  leaveGroup: MyGroupsAction.leaveGroup,
 };
 export default connect(mapStateToProps, actionCreators)(MyGroup);

@@ -121,7 +121,7 @@ router.delete("/leave/:g_id", async (req,res) => {
     }else{
       if(result.length!==0){
         console.log("Due left")
-        res.status(204).send({ msg: "Please Settle your pending balance in the group" });
+        res.status(400).send({ msg: "Please Settle your pending balance in the group" });
       }else{
 
         const left = await leaveGroup(req.params.g_id, current_user);

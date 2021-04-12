@@ -3,12 +3,18 @@ import {loginReducer} from './login/loginReducer'
 import {registration} from './signup/signupReducer'
 import {profileReducer} from './profilepage/ProfilePageReducer'
 import {myGroupsReducer} from './mygroups/MyGroupsReducer'
+import {groupReducer} from './group/groupReducer'
+import {dashboardReducer} from  './dashboard/dashboardReducer'
+import {recentActivityReducer} from './recentActivity/RecentActivityReducer'
 
 const rootReducer = combineReducers({
     loginState: loginReducer,
     registerState: registration,
     getProfileState: profileReducer,
-    myGroupsState: myGroupsReducer
+    myGroupsState: myGroupsReducer,
+    groupState: groupReducer,
+    dashboardState: dashboardReducer,
+    recentActivityState: recentActivityReducer
   });
   
   export default rootReducer;
