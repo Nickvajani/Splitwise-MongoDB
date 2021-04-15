@@ -28,6 +28,8 @@ class ProfilePage extends Component {
       language: "",
       useremail: "",
       redirectF: false,
+      imageName: "",
+
     };
   }
 
@@ -43,9 +45,10 @@ class ProfilePage extends Component {
           phoneNumber: this.props.profileProps.user.phoneNumber || "",
           timezone: this.props.profileProps.user.timezone || "",
           language: this.props.profileProps.user.language || "",
+          imageName: this.props.profileProps.user.imageName || ""
         },
         () => {
-          console.log("from main page " + this.state.defaultCurrency);
+          console.log("from main page " + this.state.imageName);
         }
       );
     }
@@ -182,7 +185,7 @@ class ProfilePage extends Component {
         <Container>
           <Row>
             <Col xs={6} md={4}>
-              <FileUpload></FileUpload>
+              <FileUpload imageName={this.state.imageName}></FileUpload>
             </Col>
 
             <Col xs="5">

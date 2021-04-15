@@ -11,8 +11,7 @@ import Button from "react-bootstrap/Button";
 import ListGroup from "react-bootstrap/ListGroup";
 import { Alert } from "react-bootstrap";
 import { Redirect } from "react-router";
-import axiosInstance from "../helpers/axios"
-
+import axiosInstance from "../helpers/axios";
 
 class CreateGroup extends Component {
   constructor(props) {
@@ -34,10 +33,9 @@ class CreateGroup extends Component {
       userDetails: [],
       addToGroupFlag: true,
       groupCreateFlag: false,
-      groupCreatedMessage:'',
+      groupCreatedMessage: "",
       redirectF: false,
-      createGroupFlag: true
-
+      createGroupFlag: true,
     };
   }
   componentDidMount() {
@@ -69,20 +67,26 @@ class CreateGroup extends Component {
       });
   };
   onTodoGroupNameChange(value) {
-    this.setState({
-      groupname: value,
-    },() => {
-      if(this.state.groupname.length<1){
-        this.setState({
-          createGroupFlag: true
-        })
+    this.setState(
+      {
+        groupname: value,
+      },
+      () => {
+        if (this.state.groupname.length < 1) {
+          this.setState({
+            createGroupFlag: true,
+          });
+        }
+        if (
+          this.state.groupname.length > 0 &&
+          this.state.userDetails.length > 0
+        ) {
+          this.setState({
+            createGroupFlag: false,
+          });
+        }
       }
-      if(this.state.groupname.length>0 && this.state.userDetails.length>0){
-        this.setState({
-          createGroupFlag: false
-        })
-      }
-    });
+    );
   }
   addToGroup = (e) => {
     e.preventDefault();
@@ -93,7 +97,13 @@ class CreateGroup extends Component {
         name: this.state.finalName,
         email: this.state.finalEmail,
       });
-      this.setState({ userDetailsFlag: true, addToGroupFlag: true,results2:[],results:[],createGroupFlag: false });
+      this.setState({
+        userDetailsFlag: true,
+        addToGroupFlag: true,
+        results2: [],
+        results: [],
+        createGroupFlag: false,
+      });
     }
   };
   removeMember = (event, value) => {
@@ -104,11 +114,11 @@ class CreateGroup extends Component {
     this.setState({
       userDetails: updatedUserDetails,
     });
-    if(this.state.userDetails.length==0){
-      console.log('hi')
+    if (this.state.userDetails.length == 0) {
+      console.log("hi");
       this.setState({
-        createGroupFlag:true
-      })
+        createGroupFlag: true,
+      });
     }
   };
   creategroup = (e) => {
@@ -117,35 +127,34 @@ class CreateGroup extends Component {
     for (let i = 0; i < this.state.userDetails.length; i++) {
       userid.push(this.state.userDetails[i].id);
     }
-    let currentUser =  JSON.parse(localStorage.getItem("user"))?.u_id
-    console.log(currentUser)
-    userid.push(currentUser)
+    let currentUser = JSON.parse(localStorage.getItem("user"))?.u_id;
+    console.log(currentUser);
+    userid.push(currentUser);
 
     let groupData = {
       g_name: this.state.groupname,
       users: userid,
     };
-    console.log(groupData)
+    console.log(groupData);
     axiosInstance.defaults.withCredentials = true;
     const response = axiosInstance
       .post("/creategroup", groupData, {
         headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
       })
       .then((response) => {
-        console.log("success")
+        console.log("success");
         this.setState({
           groupCreatedMessage: response.data.msg,
           groupCreateFlag: true,
-           redirectF: true
-        })
+          redirectF: true,
+        });
       })
       .catch((err) => {
         if (err.response.status === 400) {
-          console.log(err.response)
+          console.log(err.response);
           this.setState({
             errorMessage: "Group Already exists with the same name",
             errorFlag: true,
-            
           });
         }
       });
@@ -243,8 +252,7 @@ class CreateGroup extends Component {
             }
             //if the userDetails is empty then directly add
             else {
-              if(this.state.query != this.state.currentUserName){
-                
+              if (this.state.query != this.state.currentUserName) {
                 this.setState({
                   finalId: this.state.results[0].id,
                   finalName: this.state.results[0].name,
@@ -272,14 +280,20 @@ class CreateGroup extends Component {
   };
 
   render() {
-    if(!JSON.parse(localStorage.getItem("user"))){
-      return <Redirect to={{
-        pathname: '/login',
-    }}></Redirect>
+    if (!JSON.parse(localStorage.getItem("user"))) {
+      return (
+        <Redirect
+          to={{
+            pathname: "/login",
+          }}
+        ></Redirect>
+      );
     }
     const renderSuccess = () => {
       if (this.state.groupCreateFlag) {
-        return <Alert variant="success">{this.state.groupCreatedMessage}</Alert>;
+        return (
+          <Alert variant="success">{this.state.groupCreatedMessage}</Alert>
+        );
       }
       setTimeout(() => {
         this.setState({
@@ -296,7 +310,7 @@ class CreateGroup extends Component {
           errorFlag: false,
         });
       }, 12000);
-    };  
+    };
 
     const redirectCheck = () => {
       if (this.state.redirectF) {
@@ -306,10 +320,9 @@ class CreateGroup extends Component {
 
     return (
       <div>
-         {redirectCheck()}
+        {redirectCheck()}
         <Container>
           <Row>
-
             <Col>
               <Image src="holder.js/171x180" rounded />
               <Form>
@@ -322,8 +335,8 @@ class CreateGroup extends Component {
               </Form>
             </Col>
             <Col>
-            {renderSuccess()}
-            {renderError()}
+              {renderSuccess()}
+              {renderError()}
               <label for="name-input" style={{ fontSize: "13px" }}>
                 START A NEW GROUP:
               </label>
@@ -379,7 +392,12 @@ class CreateGroup extends Component {
                 </Button>
               </Col>
               <Col>
-                <Button disabled={this.state.createGroupFlag} onClick={this.creategroup}>Create group</Button>
+                <Button
+                  disabled={this.state.createGroupFlag}
+                  onClick={this.creategroup}
+                >
+                  Create group
+                </Button>
               </Col>
             </Row>
             {this.state.userDetailsFlag &&
@@ -389,6 +407,7 @@ class CreateGroup extends Component {
                     <Col xs="1">{user.name}</Col>
                     <Col xs="2">
                       <Button
+                        style={{ marginBottom: "10px" }}
                         onClick={(e) => {
                           this.removeMember(e, user.id);
                         }}

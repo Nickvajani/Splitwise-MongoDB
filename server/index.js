@@ -17,6 +17,7 @@ const mygroupRouter = require('./routes/api/mygroups')
 const groupRouter = require('./routes/api/group')
 const dashboardRouter = require('./routes/api/dashboard')
 const recentActivityRouter = require('./routes/api/recentActivity')
+const fileUploadRouter = require('./routes/api/fileupload')
 
 app.use(
   cors({
@@ -47,6 +48,7 @@ app.use('/mygroups', mygroupRouter)
 app.use('/groups', groupRouter)
 app.use('/dashboard', dashboardRouter)
 app.use('/recentActivity' , recentActivityRouter)
+app.use('/upload' ,fileUploadRouter)
 
 app.listen(3001, () => {
   console.log("running on the port 3001");

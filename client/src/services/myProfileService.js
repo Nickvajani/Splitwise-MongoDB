@@ -18,6 +18,7 @@ async function getProfile(data) {
         phoneNumber: response.data[0].phoneNumber,
         timezone: response.data[0].timeZone,
         language: response.data[0].language,
+        imageName: response.data[0].profilePicture,
       };
       return user;
     });

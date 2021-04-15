@@ -36,7 +36,7 @@ router.post("/get", (req, res) => {
             console.log("err " +err)
         }
         else{
-            console.log("res" +result)
+            console.log(result)
             res.send(result);
         }
     })

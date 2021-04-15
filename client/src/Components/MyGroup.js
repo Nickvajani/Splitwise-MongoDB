@@ -239,6 +239,7 @@ class MyGroup extends Component {
                         onClick={(e) => {
                           this.setRedirect(e, group.g_id);
                         }}
+                        style={{marginBottom:"10px"}}
                       >
                         Goto Group
                       </Button>
@@ -248,6 +249,8 @@ class MyGroup extends Component {
                         onClick={(e) => {
                           this.leaveGroup(e, group.g_id);
                         }}
+                        style={{marginBottom:"10px"}}
+
                       >
                         Leave Group
                       </Button>
