@@ -12,6 +12,8 @@ import { Alert } from "react-bootstrap";
 import axiosInstance from "../helpers/axios";
 import { connect } from "react-redux";
 import { GroupsAction } from "../redux/group/groupAction";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faTrash } from '@fortawesome/free-solid-svg-icons'
 
 class Group extends Component {
   constructor(props) {
@@ -34,6 +36,15 @@ class Group extends Component {
       insertedMessage: "",
       insertFlag: false,
       owerObject: [],
+      showComment: false,
+      IdForComment: '',
+      commentForExpense:'',
+      commentFlag: true,
+      commentToSave: '',
+      viewComment: false,
+      commentsFetched: [],
+      deleteFlag: false,
+      deleteMessage: "",
     };
   }
   componentDidUpdate(prevProps) {
@@ -77,6 +88,27 @@ class Group extends Component {
         this.setState({
           errorFlag:true,
           errorMessage: "Not Added"
+        })
+      }
+      if(this.props.groupProps.insertCommentFlag){
+        this.setState({
+          showComment:false,
+          insertFlag: true,
+          insertMessage: "Comment Added Successfully",
+        },() => {
+          console.log("added")
+          this.getGroupExpense();
+
+        })
+      }
+      if(this.props.groupProps.deleteCommentFlag){
+        this.setState({
+          viewComment: false,
+          deleteFlag: true,
+          deleteMessage: "Comment Deleted Successfully",
+        },()=>{
+          console.log(this.state.deleteMessage)
+          this.getGroupExpense()
         })
       }
     }
@@ -139,11 +171,49 @@ class Group extends Component {
     });
   };
 
+  showCommentModal =(e,ID) =>{
+    e.preventDefault();
+    this.setState({
+      IdForComment: ID,
+      showComment: true
+    },()=>{console.log(this.state.IdForComment)})
+  }
+  hideCommentModal = () =>{
+    this.setState({
+      showComment:false,
+      IdForComment: '',
+      commentFlag: true
+    },()=>{console.log(this.state.IdForComment)})
+  }
+  hideViewCommentModal= () =>{
+    this.setState({
+      viewComment: false
+    })
+  }
   hideModal = () => {
     this.setState({
       show: false,
     });
   };
+
+  handleCommentChange(e){
+    this.setState({
+      commentForExpense: e.target.value
+    },() => {
+      if(e.target.value.length>0){
+        this.setState({
+          commentFlag: false
+        })
+      }else{
+        this.setState({
+          commentFlag: true
+        })
+      }
+    })
+
+  }
+
+
   handleDescriptionChange(e) {
     this.setState(
       {
@@ -183,6 +253,21 @@ class Group extends Component {
       }
     );
   }
+
+  handleCommentSubmit = (e) =>{
+    e.preventDefault();
+    if(this.state.commentForExpense.length >=1){
+      this.setState({
+        commentToSave: this.state.commentForExpense
+      },async() => {
+        let data = {
+          t_id: this.state.IdForComment,
+          comment: this.state.commentToSave
+        }
+        this.props.addComment(data)
+      })
+    }
+  }
   handleSubmit = (e) => {
     e.preventDefault();
     if (
@@ -210,6 +295,36 @@ class Group extends Component {
       );
     }
   };
+  viewComment = (e,comments) =>{
+    e.preventDefault();
+    this.setState({
+      viewComment: true,
+      commentsFetched: comments
+    },()=>{
+      console.log(this.state.commentsFetched)
+    })
+  }
+  deleteComment =async(e,id)=>{
+    e.preventDefault();
+    console.log(id)
+    let data = {
+      c_id: id,
+    };
+    this.props.deleteComment(data)
+    // axiosInstance.defaults.withCredentials = true;
+    // axiosInstance.defaults.headers.common['authorization'] = localStorage.getItem('token');
+    // const response4 = await axiosInstance
+    //   .delete("/groups/deleteComment/" + data.c_id,  {
+    //     headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
+    //   })
+    //   .then((response) => {
+    //     this.setState({
+    //       viewComment: false
+    //     },()=>{this.getGroupExpense()});
+    //   });
+
+
+  }
   render() {
     const renderSuccess = () => {
       if (this.state.insertFlag) {
@@ -219,8 +334,18 @@ class Group extends Component {
         this.setState({
           insertFlag: false,
         });
-      }, 9000);
+      }, 10000);
     };
+    const renderDelete = () =>{
+    if (this.state.deleteFlag) {
+      return <Alert variant="success ">{this.state.deleteMessage}</Alert>;
+    }
+    setTimeout(() => {
+      this.setState({
+        deleteFlag: false,
+      });
+    }, 10000);
+  };
 
     const renderError = () => {
       if (this.state.errorFlag) {
@@ -243,6 +368,7 @@ class Group extends Component {
       }
     };
 
+    
     const OwerStyle = {
       textAlign: "left",
       fontFamily: "Arial",
@@ -269,7 +395,8 @@ class Group extends Component {
             </Col>
           </Row>
               {renderSuccess()}
-          <Form>
+              {renderDelete()}
+          <Form >
             <Modal show={this.state.show} onHide={this.hideModal}>
               <Modal.Header closeButton>
                 <Modal.Title>Add an expense</Modal.Title>
@@ -321,6 +448,74 @@ class Group extends Component {
                 </Button>
               </Modal.Footer>
             </Modal>
+
+
+
+            <Modal show={this.state.showComment} onHide={this.hideCommentModal}>
+              <Modal.Header closeButton>
+                <Modal.Title>Add a Note</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                <div className="form-group">
+                  <input
+                    placeholder="Enter the note...."
+                    type="text"
+                    // value={this.state.modalInputName}
+
+                    onChange={(e) => this.handleCommentChange(e)}
+                    className="form-control"
+                    required
+                  />
+                </div>
+              </Modal.Body>
+              <Modal.Footer>
+                {renderError()}
+                {renderSuccess()}
+                <Button variant="secondary" onClick={this.hideCommentModal}>
+                  Close
+                </Button>
+                <Button
+                  disabled={this.state.insertcommentFlag}
+                  variant="primary"
+                  onClick={(e) => this.handleCommentSubmit(e)}
+                  type="button"
+                  data-dismiss={this.hideCommentModal}
+                >
+                  Save
+                </Button>
+              </Modal.Footer>
+            </Modal>
+            
+
+
+            <Modal show={this.state.viewComment} onHide={this.hideViewCommentModal}>
+              <Modal.Header closeButton>
+                <Modal.Title>Comments</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                {this.state.commentsFetched.length>0 && 
+                this.state.commentsFetched.map((comments,index) => (
+                  <div>
+                   
+                    <Row  style={{ border: "1px solid rgba(0, 0, 0, 0.05)" }}>
+                      <Col xs="2" style={{textAlign:"left"}}>{comments.name}:</Col>
+                      <Col xs="6" style={{textAlign:"left"}}>{comments.comment}</Col>
+                      <Col xs="2">{this.convertDate(comments.created_at)}</Col>
+                      <Col xs="1">{String(comments.name) == String(JSON.parse(localStorage.getItem("user"))?.username)?<FontAwesomeIcon icon={faTrash} onClick={(e) =>{this.deleteComment(e,comments.id)}}/>:null}</Col>
+                    </Row>
+                  </div>
+                ))}
+              </Modal.Body>
+              <Modal.Footer>
+                {renderError()}
+                {renderSuccess()}
+                <Button variant="secondary" onClick={this.hideViewCommentModal}>
+                  Close
+                </Button>
+               
+              </Modal.Footer>
+            </Modal>
+           
           </Form>
           <Row>
             <Card style={{ width: "50rem" }}>
@@ -328,15 +523,24 @@ class Group extends Component {
                 {this.state.transactionDetails.length > 0 &&
                   this.state.transactionDetails.map((group, index) => (
                     <div key={index}>
-                      <Row style={{ border: "1px solid rgba(0, 0, 0, 0.05)" }}>
-                        <Col xs="3">{this.convertDate(group.created_at)}</Col>
-                        <Col xs="3" style={{ textTransform: "uppercase" }}>
+                      <Row style={{ border: "1px solid rgba(0, 0, 0, 0.05)" }} >
+                        <Col xs="3" onClick={(e) =>{this.showCommentModal(e,group.ID)}}>{this.convertDate(group.created_at)}</Col>
+                        <Col xs="3" onClick={(e) =>{this.showCommentModal(e,group.ID)}} style={{ textTransform: "uppercase" }}>
                           {group.description}
                         </Col>
-                        <Col xs="3" style={{ textTransform: "uppercase" }}>
+                        <Col xs="3" style={{ textTransform: "uppercase" }} onClick={(e) =>{this.showCommentModal(e,group.ID)}}>
                           <small>{group.payer_name} paid</small>
                           <br></br>
                           {this.state.userDefaultCurrency} {group.amount}
+                        </Col>
+                        <Col>
+                        <Button variant="primary"
+                        size="sm"
+                        onClick={(e) => {
+                          this.viewComment(e, group.comments);
+                        }}>
+                          View Comments
+                        </Button>
                         </Col>
                       </Row>
                     </div>
@@ -380,5 +584,7 @@ const actionCreators = {
   groupDetails: GroupsAction.groupDetails,
   getOweDetails: GroupsAction.groupOweDetails,
   addExpense: GroupsAction.addExpense,
+  addComment: GroupsAction.addComment,
+  deleteComment:  GroupsAction.deleteComment
 };
 export default connect(mapStateToProps, actionCreators)(Group);

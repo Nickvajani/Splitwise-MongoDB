@@ -43,21 +43,16 @@ async function register({ name, email, password }) {
   axiosInstance.defaults.withCredentials = true;
   //make a post request with the user data
   const response = axiosInstance.post("/user/signup", data).then((response) => {
-    // console.log(response)
-    // const user = {
-    //   username: name,
-    //   email: email,
-    //   u_id: response.data.id,
-    // };
+   
     var token = response.data;
-    localStorage.setItem("token", JSON.stringify(token));
+    localStorage.setItem("token", token);
     var decoded = jwt_decode(token.split(" ")[1]);
     var user = {
-      u_id: parseInt(decoded.id),
+      u_id: decoded.id,
       username: decoded.username,
       email: decoded.email,
     };
-    localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem("user", user);
     return response;
   });
   return response;

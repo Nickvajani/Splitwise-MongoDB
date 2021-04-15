@@ -6,7 +6,9 @@ export const GroupsAction = {
   currentUserDetails,
   groupDetails,
   groupOweDetails,
-  addExpense
+  addExpense,
+  addComment,
+  deleteComment,
 };
 
 function groupExpense(data) {
@@ -128,3 +130,52 @@ function groupDetails(data) {
       return { type: groupConstants.ADDEXPENSE_FAILURE, error };
     }
   }
+
+  function addComment(data) {
+    return (dispatch) => {
+      dispatch(request());
+  
+      groupService.addComment(data).then(
+        (comment) => {
+          dispatch(success());
+        },
+        (error) => {
+          dispatch(failure(error.toString()));
+        }
+      );
+    };
+    function request() {
+      return { type: groupConstants.ADDCOMMENT_REQUEST };
+    }
+    function success() {
+      return { type: groupConstants.ADDCOMMENT_SUCCESS };
+    }
+    function failure(error) {
+      return { type: groupConstants.ADDCOMMENT_FAILURE, error };
+    }
+  }
+  function deleteComment(data) {
+    return (dispatch) => {
+      dispatch(request());
+  
+      groupService.deleteComment(data).then(
+        (deleteDetails) => {
+          dispatch(success());
+        },
+        (error) => {
+          dispatch(failure(error.toString()));
+        }
+      );
+    };
+    function request() {
+      return { type: groupConstants.DELETECOMMENT_REQUEST };
+    }
+    function success() {
+      return { type: groupConstants.DELETECOMMENT_SUCCESS };
+    }
+    function failure(error) {
+      return { type: groupConstants.DELETECOMMENT_FAILURE, error };
+    }
+  }
+
+

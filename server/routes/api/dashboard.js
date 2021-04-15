@@ -1,13 +1,14 @@
 const express = require("express");
 const router = express.Router();
+const {checkAuth} = require("../../config/passport")
 
 let User = require("../../models/userModel");
 let Group = require("../../models/createGroupModel");
 let Transaction = require("../../models/transactionModel");
-const { resolve } = require("path");
 
-router.get("/getGroupsId", (req, res) => {
+router.get("/getGroupsId" ,(req, res) => {
   var current_user = req.header("user");
+  console.log("group id")
   Group.find(
     { "members.ID": current_user, "members.is_accepted": true },
     (err, result) => {
@@ -56,7 +57,7 @@ router.get("/getTotalOwe", (req, res) => {
     });
 });
 
-router.get("/getTotalGet", (req, res) => {
+router.get("/getTotalGet",(req, res) => {
   var current_user = req.header("user");
   Transaction.find({ payer_id: current_user })
     .populate({ path: "ower.u_id" })

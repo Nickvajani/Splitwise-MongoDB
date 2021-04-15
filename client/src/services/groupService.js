@@ -6,6 +6,8 @@ export const groupService = {
   groupDetails,
   groupOweDetails,
   addExpense,
+  addComment,
+  deleteComment
 };
 
 async function groupExpense(data) {
@@ -93,3 +95,36 @@ async function addExpense(data) {
 
   return response;
 }
+
+async function addComment(data) {
+  axiosInstance.defaults.withCredentials = true;
+        const response = await axiosInstance.post("/groups/comment" ,data,{
+          headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
+        }).then((response) => {
+          let comment ={
+            insertComment: "Comment Added"
+          }
+          return comment
+        })
+        return response
+}
+async function deleteComment(data) {
+  axiosInstance.defaults.withCredentials = true;
+    axiosInstance.defaults.headers.common['authorization'] = localStorage.getItem('token');
+    const response = await axiosInstance
+      .delete("/groups/deleteComment/" + data.c_id,  {
+        headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
+      })
+      .then((response) => {
+       let deleteDetails ={
+        message: "comment deleted"
+       }
+       return deleteDetails
+        // this.setState({
+        //   viewComment: false
+        // },()=>{this.getGroupExpense()});
+      });
+      return response
+}
+
+

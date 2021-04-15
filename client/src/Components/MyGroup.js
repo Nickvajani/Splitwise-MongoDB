@@ -90,22 +90,6 @@ class MyGroup extends Component {
   getGroups = () => {
     let typedGroupName = { g_name: this.state.typedSearchGroupName };
     this.props.getGroups(typedGroupName);
-
-    // axiosInstance.defaults.withCredentials = true;
-    // let typedGroupName = { g_name: this.state.typedSearchGroupName };
-    // const response = axiosInstance
-    //   .post(
-    //     "/mygroups/getGroups",
-    //     typedGroupName,
-    //     {
-    //       headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
-    //     }
-    //   )
-    //   .then((response) => {
-    //     this.setState({
-    //       joinedGroupNames: response.data,
-    //     });
-    //   });
   };
   handleInputGroupNameChange = () => {
     this.setState(
@@ -141,25 +125,6 @@ class MyGroup extends Component {
       successMessage: "Group Joined Successfully!!",
     });
     this.props.joinGroup(idvalue);
-
-    // axiosInstance.defaults.withCredentials = true;
-    // const response = axiosInstance
-    //   .put(
-    //     "/mygroups/" +
-    //       idvalue +
-    //       "/accept",
-    //     null,
-    //     {
-    //       headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
-    //     }
-    //   )
-    //   .then((response) => {
-    //     this.joinedGroup();
-    //     this.getInvitedGroups();
-    //     this.setState({
-    //       joinedGroupNames: [],
-    //     });
-    //   });
     this.joinedGroup();
   };
   setRedirect = (e, value) => {
@@ -175,33 +140,6 @@ class MyGroup extends Component {
       g_id: value,
     };
     this.props.leaveGroup(data);
-
-    // axiosInstance.defaults.withCredentials = true;
-    // const response = await axiosInstance
-    //   .delete(
-    //     "/mygroups/leave/" +
-    //       data.g_id,
-    //     {
-    //       headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
-    //     }
-    //   )
-    //   .then((response) => {
-    //     console.log(response.status);
-    //     console.log(response);
-    //     if (response.status == 204) {
-    //       console.log("inside");
-    //       this.setState({
-    //         errorMessage: "Please settle your pending balance in the group",
-    //         errorFlag: true,
-    //       });
-    //     } else if (response.status === 200) {
-    //       console.log("else if");
-    //       this.setState({
-    //         successMessage: "Group left!!",
-    //         leaveGroupFlag: true,
-    //       });
-    //     }
-    //   });
   };
   renderRedirect = () => {
     if (this.state.redirect) {

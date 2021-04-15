@@ -18,6 +18,13 @@ export const groupConstants = {
 
     ADDEXPENSE_REQUEST: "Request for add expense",
     ADDEXPENSE_SUCCESS: "Expense added",
-    ADDEXPENSE_FAILURE: "Expense not added"
+    ADDEXPENSE_FAILURE: "Expense not added",
 
+    ADDCOMMENT_REQUEST: "Request for add comment",
+    ADDCOMMENT_SUCCESS: "Comment added",
+    ADDCOMMENT_FAILURE: "Comment not added",
+
+    DELETECOMMENT_REQUEST: "Request for delete comment",
+    DELETECOMMENT_SUCCESS: "Comment deleted",
+    DELETECOMMENT_FAILURE: "Comment not deleted",
 };

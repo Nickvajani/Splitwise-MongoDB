@@ -35,7 +35,7 @@ const Group = require("./models/createGroupModel");
 
 //connect to Mongo
 mongoose
-  .connect(db, {poolSize: 500,useCreateIndex: true ,useNewUrlParser: true})
+  .connect(db, {poolSize: 500,useCreateIndex: true ,useNewUrlParser: true,useUnifiedTopology: true  })
   .then(()=> console.log('Mongo connected........'))
   .catch(err => console.log(err))
 

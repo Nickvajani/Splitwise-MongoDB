@@ -34,21 +34,37 @@ router.get("/expenses", (req, res) => {
   var group_id = req.query.g_id;
   Transaction.find({ g_id: group_id })
     .populate({ path: "g_id" })
+    .populate({path: "comments.u_id"})
     .populate({ path: "payer_id" })
     .sort({ createdAt: -1 })
     .then((user) => {
       let group_details = [];
       for (let i = 0; i < user.length; i++) {
+        let comments = []
+        // if(user[i].comments){
+        //   console.log(user[i].comments.length)
+        // }
+        for(j=0;j<user[i].comments.length;j++){
+          let commentObj ={
+            id: user[i].comments[j]._id,
+            name: user[i].comments[j].u_id.name,
+            comment: user[i].comments[j].comment,
+            created_at: user[i].comments[j].created_at
+          }
+          // console.log(commentObj)
+          comments.push(commentObj)
+        }
         let obj = {
           ID: user[i]._id,
           amount: user[i].amount,
           payer_name: user[i].payer_id.name,
           description: user[i].description,
           created_at: user[i].createdAt,
+          comments: comments
         };
         group_details.push(obj);
       }
-      console.log(group_details)
+      // console.log(group_details)
       res.send(group_details);
     });
 });
@@ -130,27 +146,27 @@ router.get("/owe", async (req, res) => {
         }
         if (!found) newMembers.push(memberList[i]);
       }
-      
+
       // newMembers will have an id of 1 user
       if (newMembers.length > 0) {
         Transaction.find({ g_id: group_id, payer_id: newMembers[0] })
           .populate({ path: "g_id" })
           .populate({ path: "payer_id" })
-          .then((result) =>{
-            if(result.length>=1){
-              newMembersObj={
+          .then((result) => {
+            if (result.length >= 1) {
+              newMembersObj = {
                 amount_owed: 0,
-                name:result[0].payer_id.name,
-                group_name: result[0].g_id.g_name
-              }
+                name: result[0].payer_id.name,
+                group_name: result[0].g_id.g_name,
+              };
               resolve(newMembersObj);
-            }else{
-              resolve(null)
+            } else {
+              resolve(null);
             }
-          })
-        }else{
-          resolve(null)
-        }
+          });
+      } else {
+        resolve(null);
+      }
     });
 
     if (res4 != null) {
@@ -273,4 +289,35 @@ router.post("/addExpense/:g_id", async (req, res) => {
   });
 });
 
+router.post("/comment", (req, res) => {
+  // console.log(req.body.t_id);
+  // console.log(req.body.comment);
+  var current_user = req.header("user");
+  // console.log(current_user);
+  Transaction.updateOne({
+    _id: req.body.t_id
+  },
+  {
+    $push :{ comments:[{u_id: current_user ,comment: req.body.comment }]}
+
+  },
+  (err, result) => {
+    if (err) {
+      console.log(err);
+    } else {
+      res.status(200).send(result);
+    }
+  })
+});
+
+router.delete("/deleteComment/:c_id" , async(req,res) => {
+  var comment_id = req.params.c_id;
+  Transaction.findOneAndUpdate({"comments._id": comment_id},{$pull:{comments:{_id:comment_id}}},{multi:true} ,(err,result) =>{
+    if(err){
+      console.log(err)
+    }else{
+      res.status(200).send({ msg: "Comment Removed" })    }
+  })
+  // Transaction.findOneAndUpdate({comments._id: })
+})
 module.exports = router;

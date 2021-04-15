@@ -53,6 +53,27 @@ export function groupReducer(state = [], action) {
                 return {
                     errorFlag: true
                 }
+
+                case groupConstants.ADDCOMMENT_REQUEST:
+                  return state;
+                case groupConstants.ADDCOMMENT_SUCCESS:
+                  return{
+                        insertCommentFlag: true,
+                  };
+                case groupConstants.ADDCOMMENT_FAILURE:
+                  return {
+                      errorFlag: true
+                  }
+                  case groupConstants.DELETECOMMENT_REQUEST:
+                    return state;
+                  case groupConstants.DELETECOMMENT_SUCCESS:
+                    return{
+                          deleteCommentFlag: true,
+                    };
+                  case groupConstants.DELETECOMMENT_FAILURE:
+                    return {
+                        errorFlag: true
+                    }
     default:
       return state;
   }

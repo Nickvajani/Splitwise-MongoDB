@@ -3,7 +3,8 @@ const router = express.Router();
 var bcrypt = require("bcryptjs");
 const jwt = require('jsonwebtoken');
 const { secret } = require('../../config/keys');
-
+const { auth } = require("../../config/passport")
+auth();
 let User = require("../../models/userModel");
 
 // @route Get user

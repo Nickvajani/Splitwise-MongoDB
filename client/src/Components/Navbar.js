@@ -12,7 +12,7 @@ import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import { NavbarBrand } from "react-bootstrap";
 import { withRouter } from "react-router-dom";
-import splitwise from "../splitwise.png"
+import splitwise from "../splitwise.png";
 
 class Navbar extends Component {
   constructor(props) {
@@ -20,6 +20,11 @@ class Navbar extends Component {
 
     this.state = {
       redirect: false,
+      dashboard: false,
+      myGroup: false,
+      profile: false,
+      createGroup: false,
+      recentActivity: false,
     };
   }
   logout() {
@@ -30,23 +35,77 @@ class Navbar extends Component {
     this.setState({
       redirect: true,
     });
-    //redirectvar = <Redirect to="/login"></Redirect>;
-    // this.props.history.push('/')
   }
-  
-  render() {
-    // const { redirect } = this.state;
-    // if (redirect) {
-    //   return <Redirect to="/login"></Redirect>;
-    // }
+  dashboard() {
+    this.setState({
+      dashboard: true,
+    });
+  }
+  myGroup() {
+    this.setState({
+      myGroup: true,
+    });
+  }
+  myProfile() {
+    this.setState({
+      profile: true,
+    });
+  }
+  createGroup() {
+    this.setState({
+      createGroup: true,
+    });
+  }
+  recentActivity() {
+    this.setState({
+      recentActivity: true,
+    });
+  }
 
-    let currentUser = JSON.parse(localStorage.getItem("user"))?.username
+  render() {
+    const { redirect } = this.state;
+    if (redirect) {
+      return <Redirect to="/login"></Redirect>;
+    }
+    if (this.state.dashboard) {
+      this.setState({
+        dashboard: false,
+      });
+      return <Redirect to="/dashboard"></Redirect>;
+    }
+    if (this.state.myGroup) {
+      this.setState({
+        myGroup: false,
+      });
+      return <Redirect to="/mygroups"></Redirect>;
+    }
+    if (this.state.profile) {
+      this.setState({
+        profile: false,
+      });
+      return <Redirect to="/profile"></Redirect>;
+    }
+    if (this.state.createGroup) {
+      this.setState({
+        createGroup: false,
+      });
+      return <Redirect to="/createGroup"></Redirect>;
+    }
+    if (this.state.recentActivity) {
+      this.setState({
+        recentActivity: false,
+      });
+      return <Redirect to="/recentactivity"></Redirect>;
+    }
+
+    let currentUser = JSON.parse(localStorage.getItem("user"))?.username;
 
     if (currentUser == null) {
       return (
         <nav className="navbar navbar-custom">
-          
-          <div class="col"><img src={splitwise} style={{height:"19px"}}></img>Splitwise</div>
+          <div class="col">
+            <img src={splitwise} style={{ height: "19px" }}></img>Splitwise
+          </div>
           <div class="col text-right">
             <Link to="/login">
               <button type="button" class="btn btn-primary btn-sm">
@@ -68,20 +127,19 @@ class Navbar extends Component {
     } else {
       return (
         <nav className="navbar navbar-custom">
-          <div class="col"><img src={splitwise} style={{height:"19px"}}></img>Splitwise</div>
+          <div class="col">
+            <img src={splitwise} style={{ height: "19px" }}></img>Splitwise
+          </div>
 
           <div class="col text-right">
-            <DropdownButton
-              id="dropdown-default-button"
-              title={currentUser}
-            >
-              <Dropdown.Item href="./dashboard">Dashboard</Dropdown.Item>
-              <Dropdown.Item href="./mygroups">My group</Dropdown.Item>
-              <Dropdown.Item href="./profile">My Profile</Dropdown.Item>
-              <Dropdown.Item href="./createGroup">Create Group</Dropdown.Item>
-              <Dropdown.Item href="./recentactivity">
-                Recent Activity
+            <DropdownButton id="dropdown-default-button" title={currentUser}>
+              <Dropdown.Item onClick={this.dashboard.bind(this)}>
+                Dashboard
               </Dropdown.Item>
+              <Dropdown.Item onClick={this.myGroup.bind(this)}>My group</Dropdown.Item>
+              <Dropdown.Item onClick={this.myProfile.bind(this)}>My Profile</Dropdown.Item>
+              <Dropdown.Item onClick={this.createGroup.bind(this)}>Create Group</Dropdown.Item>
+              <Dropdown.Item onClick={this.recentActivity.bind(this)}>Recent Activity</Dropdown.Item>
               <Dropdown.Item href="./login" onClick={this.logout.bind(this)}>
                 Logout
               </Dropdown.Item>
