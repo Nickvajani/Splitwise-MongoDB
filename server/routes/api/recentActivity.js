@@ -5,6 +5,24 @@ let User = require("../../models/userModel");
 let Group = require("../../models/createGroupModel");
 let Transaction = require("../../models/transactionModel");
 
+router.get("/groupNames" , (req,res) => {
+  var current_user = req.header("user");
+
+  Group.find(
+    { "members.ID": current_user, "members.is_accepted": true },
+    (err, result) => {
+      if (err) {
+        console.log(err);
+      } else {
+        groupMembers = [];
+        for (i = 0; i < result.length; i++) {
+          groupMembers[i] = result[i].g_name;
+        }
+        res.status(200).send(groupMembers);
+      }
+    }
+  );
+})
 router.get("/", async (req, res) => {
   var current_user = req.header("user");
   try {
@@ -33,9 +51,11 @@ router.get("/", async (req, res) => {
         if(contents != null){
           outerTransactions = [...outerTransactions, ...contents];
         }
-        
       })
     );
+   outerTransactions.sort(function (a, b) {
+        return new Date(b.created_at) - new Date(a.created_at);
+      });
     // console.log("outer")
     // console.log(outerTransactions)
     res.status(200).send(outerTransactions);

@@ -13,6 +13,7 @@ class RecentActivity extends Component {
 
     this.state = {
       recentActivityDetails: [],
+      groupNames:[]
     };
   }
 
@@ -46,6 +47,18 @@ class RecentActivity extends Component {
     //     });
     //   });
   };
+  getGroupNames = async() =>{
+    axiosInstance.defaults.withCredentials = true;
+    const response1 = await axiosInstance
+      .get("/recentActivity/groupNames", {
+        headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
+      })
+      .then((response) => {
+        this.setState({
+          groupNames: response.data
+        })
+      });
+  }
   getRecentActivity = async () => {
 this.props.getRecentActivityDetails();
     // axiosInstance.defaults.withCredentials = true;
@@ -60,10 +73,42 @@ this.props.getRecentActivityDetails();
     //     });
     //   });
   };
+  sortForMostRecentLast =async(e) =>{
+    e.preventDefault();
+    let sortArray = [...this.state.recentActivityDetails]
 
+    await sortArray.sort(function (a, b) {
+      return new Date(a.created_at) - new Date(b.created_at);
+    });
+    this.setState({
+      recentActivityDetails: sortArray
+    })
+    
+  }
+  sortForMostRecentFirst =async(e) =>{
+    e.preventDefault();
+    let sortArray = [...this.state.recentActivityDetails]
+
+    await sortArray.sort(function (a, b) {
+      return new Date(b.created_at) - new Date(a.created_at);
+    });
+    this.setState({
+      recentActivityDetails: sortArray
+    })
+    
+  }
+  filterGroups =async(e,name) =>{
+    e.preventDefault();
+  //  await this.getRecentActivity(e);
+    let newArray = this.state.recentActivityDetails.filter(gname => gname.groupName == name)
+    this.setState({
+      recentActivityDetails: newArray
+    })
+  }
   async componentDidMount() {
     const r2 = await this.getCurrentUserDetails();
     const r1 = await this.getRecentActivity();
+    await this.getGroupNames();
   }
   render() {
     let amountCheck = (value) => {
@@ -104,26 +149,26 @@ this.props.getRecentActivityDetails();
               <h3>Recent Activity</h3>
             </Col>
             <Col xs="1" style={{ backgroundColor: "lightgray" }}>
-              Filter by{" "}
+              Filter by:
             </Col>
             <Col xs="2" style={{ backgroundColor: "lightgray" }}>
               <DropdownButton id="dropdown-basic-button" title="Groups">
-                <Dropdown.Item>Farewell Party</Dropdown.Item>
-                <Dropdown.Item>Another action</Dropdown.Item>
-                <Dropdown.Item>Something else</Dropdown.Item>
+                {this.state.groupNames.map((name,index) =>(
+                  <Dropdown.Item onClick={(e)=>{this.filterGroups(e,name)}}>{name}</Dropdown.Item>
+                ))}
+                <Dropdown.Item onClick={(e)=>{this.getRecentActivity(e)}}>All</Dropdown.Item>
               </DropdownButton>
             </Col>
             <Col xs="1" style={{ backgroundColor: "lightgray" }}>
-              Sort by{" "}
+              Sort by:
             </Col>
             <Col xs="3" style={{ backgroundColor: "lightgray" }}>
               <DropdownButton
                 id="dropdown-basic-button"
                 title="Most recent on top"
               >
-                <Dropdown.Item>Farewell Party</Dropdown.Item>
-                <Dropdown.Item>Another action</Dropdown.Item>
-                <Dropdown.Item>Something else</Dropdown.Item>
+                <Dropdown.Item onClick={(e)=>{this.sortForMostRecentLast(e)}}>Most recent Last</Dropdown.Item>
+                <Dropdown.Item onClick={(e)=>{this.sortForMostRecentFirst(e)}}>Most recent First</Dropdown.Item>
               </DropdownButton>
             </Col>
           </Row>
