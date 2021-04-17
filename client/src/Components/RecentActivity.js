@@ -6,14 +6,33 @@ import DropdownButton from "react-bootstrap/DropdownButton";
 import axiosInstance from "../helpers/axios";
 import { connect } from "react-redux";
 import { RecentActivityAction } from "../redux/recentActivity/RecentActivityAction";
+import DataTable from 'react-data-table-component';
 
+// const customStyles ={
+//   headCells: {
+//     style: {
+//       paddingLeft: '10%', // override the cell padding for head cells
+//       paddingRight: '10%',
+//     },
+//   },
+//   cells: {
+//     style: {
+//       paddingLeft: '1%', // override the cell padding for data cells
+//       paddingRight: '1%',
+//     },
+//   }
+// }
+const size = [2,5,10]
 class RecentActivity extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
       recentActivityDetails: [],
-      groupNames:[]
+      groupNames:[],
+      columns:[]
+        
+      
     };
   }
 
@@ -109,6 +128,48 @@ this.props.getRecentActivityDetails();
     const r2 = await this.getCurrentUserDetails();
     const r1 = await this.getRecentActivity();
     await this.getGroupNames();
+
+    this.state.columns= [
+      {
+          name: "Name",
+          selector:"payerName",
+          format: (row, index) => {
+            if(row.payerName ==JSON.parse(localStorage.getItem("user"))?.username){
+              return "You " 
+            }else{
+              return row.payerName
+            }
+            }
+      },
+      {
+        name: "Description",
+        selector:"description",
+        format: (row, index) => {
+          return "Added " +row.description
+          }
+      },
+      {
+        name: "Group Name",
+        selector:"groupName",
+        format: (row, index) => {
+          return "in " + row.groupName
+          }
+      },
+      {
+        name: "Amount",
+        selector:"amount",
+        format: (row, index) => {
+          if(row.amount>=1){
+            return `You Owe ${this.state.userDefaultCurrency}` + row.amount
+          }else if(row.amount<0){
+            return `You Get Back ${this.state.userDefaultCurrency}` + row.amount * -1
+          }
+          else{
+            return ` This transaction is settled`;
+          }
+          }
+      },
+      ]
   }
   render() {
     let amountCheck = (value) => {
@@ -174,7 +235,15 @@ this.props.getRecentActivityDetails();
           </Row>
           <Row>
             <Col xs="2"></Col>
-            <Col style={{ textAlign: "left" }}>
+            <DataTable
+            columns={this.state.columns}
+            data={this.state.recentActivityDetails}
+            paginationRowsPerPageOptions={size}
+            paginationPerPage={2}
+            	// customStyles={customStyles}
+            pagination
+            />
+            {/* <Col style={{ textAlign: "left" }}>
               {this.state.recentActivityDetails.length > 0 &&
                 this.state.recentActivityDetails.map((group, index) => (
                   <div key={index}>
@@ -197,7 +266,7 @@ this.props.getRecentActivityDetails();
                     </Row>
                   </div>
                 ))}
-            </Col>
+            </Col> */}
           </Row>
         </Container>
       </div>
