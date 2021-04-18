@@ -6,6 +6,7 @@ import {myGroupsReducer} from './mygroups/MyGroupsReducer'
 import {groupReducer} from './group/groupReducer'
 import {dashboardReducer} from  './dashboard/dashboardReducer'
 import {recentActivityReducer} from './recentActivity/RecentActivityReducer'
+import {createGroupReducer} from './createGroup/createGroupReducer'
 
 const rootReducer = combineReducers({
     loginState: loginReducer,
@@ -14,7 +15,8 @@ const rootReducer = combineReducers({
     myGroupsState: myGroupsReducer,
     groupState: groupReducer,
     dashboardState: dashboardReducer,
-    recentActivityState: recentActivityReducer
+    recentActivityState: recentActivityReducer,
+    createGroupState: createGroupReducer
   });
   
   export default rootReducer;

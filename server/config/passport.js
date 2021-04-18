@@ -11,12 +11,10 @@ function auth() {
         jwtFromRequest: ExtractJwt.fromAuthHeaderWithScheme("jwt"),
         secretOrKey: secret
     };
-    console.log(opts)
     passport.use(
         new JwtStrategy(opts, (jwt_payload, callback) => {
             const user_id = jwt_payload.id;
-            console.log("user_id");
-            console.log(user_id);
+           
             User.findById(user_id, (err, results) => {
                 if (err) {
                     return callback(err, false);

@@ -7,6 +7,8 @@ export const recentActivityService = {
 
 async function userDetails() {
   axiosInstance.defaults.withCredentials = true;
+  axiosInstance.defaults.headers.common['authorization'] = JSON.parse(localStorage.getItem('token'));
+
   const response = await axiosInstance
     .get("/groups/userDetails", {
       headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
@@ -22,6 +24,8 @@ async function userDetails() {
 
 async function recentActivity(){
     axiosInstance.defaults.withCredentials = true;
+    axiosInstance.defaults.headers.common['authorization'] = JSON.parse(localStorage.getItem('token'));
+
     const response = await axiosInstance
       .get("/recentActivity", {
         headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },

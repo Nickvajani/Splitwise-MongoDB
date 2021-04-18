@@ -1,10 +1,12 @@
 const express = require("express");
 const router = express.Router();
+const {checkAuth} = require("../../config/passport")
+
 
 let Group = require("../../models/createGroupModel");
 let User = require("../../models/userModel");
 
-router.post("/getName", (req, res) => {
+router.post("/getName", checkAuth , (req, res) => {
   let name = req.body.name;
   User.find({ name: new RegExp(name, "i") }, (err, result) => {
     if (err) {
@@ -23,7 +25,7 @@ router.post("/getName", (req, res) => {
   });
 });
 
-router.post("/getEmail", (req, res) => {
+router.post("/getEmail", checkAuth , (req, res) => {
   let email = req.body.email;
   console.log(email);
   User.find({ email: new RegExp(email, "i") }, (err, result) => {
@@ -45,7 +47,7 @@ router.post("/getEmail", (req, res) => {
   });
 });
 
-router.post("/", (req, res) => {
+router.post("/", checkAuth , (req, res) => {
   let group_admin = req.header("user");
   var members = [];
   req.body.users.forEach((user) => {

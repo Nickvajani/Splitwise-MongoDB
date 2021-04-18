@@ -1,11 +1,13 @@
 const express = require("express");
 const router = express.Router();
+const {checkAuth} = require("../../config/passport")
+
 
 let User = require("../../models/userModel");
 let Group = require("../../models/createGroupModel");
 let Transaction = require("../../models/transactionModel");
 
-router.get("/groupNames" , (req,res) => {
+router.get("/groupNames", checkAuth  , (req,res) => {
   var current_user = req.header("user");
 
   Group.find(
@@ -23,7 +25,7 @@ router.get("/groupNames" , (req,res) => {
     }
   );
 })
-router.get("/", async (req, res) => {
+router.get("/", checkAuth , async (req, res) => {
   var current_user = req.header("user");
   try {
     let listOfGroupId = await new Promise((resolve, reject) => {

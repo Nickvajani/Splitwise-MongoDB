@@ -11,7 +11,7 @@ export const dashboardService = {
 
 async function userDetails() {
   axiosInstance.defaults.withCredentials = true;
-  axiosInstance.defaults.headers.common['authorization'] = localStorage.getItem('token');
+  axiosInstance.defaults.headers.common['authorization'] = JSON.parse(localStorage.getItem('token'));
   const response = await axiosInstance
     .get("/groups/userDetails", {
       headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
@@ -27,7 +27,7 @@ async function userDetails() {
 
 async function userOweDetails() {
   axiosInstance.defaults.withCredentials = true;
-  axiosInstance.defaults.headers.common['authorization'] = localStorage.getItem('token');
+  axiosInstance.defaults.headers.common['authorization'] = JSON.parse(localStorage.getItem('token'));
 
   const response = await axiosInstance
     .get("/dashboard/getTotalOwe", {
@@ -44,7 +44,7 @@ async function userOweDetails() {
 
 async function userGetBackDetails() {
   axiosInstance.defaults.withCredentials = true;
-  axiosInstance.defaults.headers.common['authorization'] = localStorage.getItem('token');
+  axiosInstance.defaults.headers.common['authorization'] = JSON.parse(localStorage.getItem('token'));
 
   const response = await axiosInstance
     .get("/dashboard/getTotalGet", {
@@ -61,7 +61,7 @@ async function userGetBackDetails() {
 
 async function groupForSettle(typedGroupName) {
   axiosInstance.defaults.withCredentials = true;
-  axiosInstance.defaults.headers.common['authorization'] = localStorage.getItem('token');
+  axiosInstance.defaults.headers.common['authorization'] = JSON.parse(localStorage.getItem('token'));
 
   const response = await axiosInstance
     .post("/mygroups/getGroups", typedGroupName, {
@@ -78,7 +78,7 @@ async function groupForSettle(typedGroupName) {
 
 async function personForSettle(typedPersonName) {
   axiosInstance.defaults.withCredentials = true;
-  axiosInstance.defaults.headers.common['authorization'] = localStorage.getItem('token');
+  axiosInstance.defaults.headers.common['authorization'] = JSON.parse(localStorage.getItem('token'));
 
   const response = await axiosInstance
     .post("/dashboard/getPerson", typedPersonName, {
@@ -96,7 +96,7 @@ async function personForSettle(typedPersonName) {
 async function settle(data) {
     // console.log("in settle service")
   axiosInstance.defaults.withCredentials = true;
-  axiosInstance.defaults.headers.common['authorization'] = localStorage.getItem('token');
+  axiosInstance.defaults.headers.common['authorization'] = JSON.parse(localStorage.getItem('token'));
 
   const response = await axiosInstance
     .post("/dashboard/settle", data, {

@@ -6,7 +6,7 @@ let User = require("../../models/userModel");
 let Group = require("../../models/createGroupModel");
 let Transaction = require("../../models/transactionModel");
 
-router.get("/getGroupsId" ,(req, res) => {
+router.get("/getGroupsId", checkAuth ,(req, res) => {
   var current_user = req.header("user");
   console.log("group id")
   Group.find(
@@ -25,7 +25,7 @@ router.get("/getGroupsId" ,(req, res) => {
   );
 });
 
-router.get("/getGroupNames", (req, res) => {
+router.get("/getGroupNames", checkAuth , (req, res) => {
   var group_id = req.query.g_id;
   Group.find({ _id: group_id }, (err, result) => {
     if (err) {
@@ -37,7 +37,7 @@ router.get("/getGroupNames", (req, res) => {
   });
 });
 
-router.get("/getTotalOwe", (req, res) => {
+router.get("/getTotalOwe", checkAuth , (req, res) => {
   var current_user = req.header("user");
   Transaction.find({ "ower.u_id": current_user, "ower.is_settled": false })
     .populate({ path: "ower.u_id" })
@@ -57,7 +57,7 @@ router.get("/getTotalOwe", (req, res) => {
     });
 });
 
-router.get("/getTotalGet",(req, res) => {
+router.get("/getTotalGet", checkAuth ,(req, res) => {
   var current_user = req.header("user");
   Transaction.find({ payer_id: current_user })
     .populate({ path: "ower.u_id" })
@@ -81,7 +81,7 @@ router.get("/getTotalGet",(req, res) => {
     });
 });
 
-router.post("/getPerson", (req, res) => {
+router.post("/getPerson", checkAuth , (req, res) => {
   var current_user = req.header("user");
 
   Transaction.find({
@@ -115,7 +115,7 @@ router.post("/getPerson", (req, res) => {
     });
 });
 
-router.post("/settle", async (req, res) => {
+router.post("/settle", checkAuth , async (req, res) => {
   var current_user = req.header("user");
   // console.log("in settle")
   let TransactionId = await new Promise((resolve, reject) => {

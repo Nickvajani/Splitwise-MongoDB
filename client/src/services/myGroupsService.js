@@ -10,6 +10,8 @@ export const myGroupsService = {
 
 async function getJoinedGroups() {
   axiosInstance.defaults.withCredentials = true;
+  axiosInstance.defaults.headers.common['authorization'] = JSON.parse(localStorage.getItem('token'));
+
   const response = await axiosInstance
     .get("/mygroups/joined", {
       headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
@@ -24,6 +26,8 @@ async function getJoinedGroups() {
 }
 async function getInvitedGroups() {
   axiosInstance.defaults.withCredentials = true;
+  axiosInstance.defaults.headers.common['authorization'] = JSON.parse(localStorage.getItem('token'));
+
   const response = await axiosInstance
     .get("/mygroups/invites", {
       headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
@@ -38,6 +42,8 @@ async function getInvitedGroups() {
 }
 async function getGroups(typedGroupName) {
   axiosInstance.defaults.withCredentials = true;
+  axiosInstance.defaults.headers.common['authorization'] = JSON.parse(localStorage.getItem('token'));
+
   const response = await axiosInstance
     .post("/mygroups/getGroups", typedGroupName, {
       headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
@@ -52,6 +58,8 @@ async function getGroups(typedGroupName) {
 }
 async function joinGroup(idvalue) {
   axiosInstance.defaults.withCredentials = true;
+  axiosInstance.defaults.headers.common['authorization'] = JSON.parse(localStorage.getItem('token'));
+
   const response = await axiosInstance
     .put("/mygroups/" + idvalue + "/accept", null, {
       headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
@@ -66,6 +74,8 @@ async function joinGroup(idvalue) {
 }
 async function leaveGroup(data) {
   axiosInstance.defaults.withCredentials = true;
+  axiosInstance.defaults.headers.common['authorization'] = JSON.parse(localStorage.getItem('token'));
+
   const response = await axiosInstance
     .delete("/mygroups/leave/" + data.g_id, {
       headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },

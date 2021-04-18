@@ -1,11 +1,13 @@
 const express = require("express");
 const router = express.Router();
+const {checkAuth} = require("../../config/passport")
+
 
 let User = require("../../models/userModel");
 let Group = require("../../models/createGroupModel");
 let Transaction = require("../../models/transactionModel");
 
-router.get("/userDetails", (req, res) => {
+router.get("/userDetails", checkAuth , (req, res) => {
   var current_user = req.header("user");
   User.find({ _id: current_user }, (err, result) => {
     if (err) {
@@ -19,7 +21,7 @@ router.get("/userDetails", (req, res) => {
   });
 });
 
-router.get("/groupDetails", (req, res) => {
+router.get("/groupDetails", checkAuth , (req, res) => {
   var group_id = req.query.g_id;
   Group.find({ _id: group_id }, (err, result) => {
     if (err) {
@@ -30,7 +32,7 @@ router.get("/groupDetails", (req, res) => {
   });
 });
 
-router.get("/expenses", (req, res) => {
+router.get("/expenses", checkAuth , (req, res) => {
   var group_id = req.query.g_id;
   Transaction.find({ g_id: group_id })
     .populate({ path: "g_id" })
@@ -69,7 +71,7 @@ router.get("/expenses", (req, res) => {
     });
 });
 
-router.get("/owe", async (req, res) => {
+router.get("/owe", checkAuth , async (req, res) => {
   // console.log("owe called");
   var group_id = req.query.g_id;
   try {
@@ -231,7 +233,7 @@ router.get("/owe", async (req, res) => {
     res.status(400).json({ msg: err });
   }
 });
-router.post("/addExpense/:g_id", async (req, res) => {
+router.post("/addExpense/:g_id", checkAuth , async (req, res) => {
   console.log("adding");
   var current_user = req.header("user");
   var group_id = req.params.g_id;
@@ -289,7 +291,7 @@ router.post("/addExpense/:g_id", async (req, res) => {
   });
 });
 
-router.post("/comment", (req, res) => {
+router.post("/comment", checkAuth , (req, res) => {
   // console.log(req.body.t_id);
   // console.log(req.body.comment);
   var current_user = req.header("user");
@@ -310,7 +312,7 @@ router.post("/comment", (req, res) => {
   })
 });
 
-router.delete("/deleteComment/:c_id" , async(req,res) => {
+router.delete("/deleteComment/:c_id", checkAuth  , async(req,res) => {
   var comment_id = req.params.c_id;
   Transaction.findOneAndUpdate({"comments._id": comment_id},{$pull:{comments:{_id:comment_id}}},{multi:true} ,(err,result) =>{
     if(err){

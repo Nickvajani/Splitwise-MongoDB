@@ -6,33 +6,17 @@ import DropdownButton from "react-bootstrap/DropdownButton";
 import axiosInstance from "../helpers/axios";
 import { connect } from "react-redux";
 import { RecentActivityAction } from "../redux/recentActivity/RecentActivityAction";
-import DataTable from 'react-data-table-component';
+import DataTable from "react-data-table-component";
 
-// const customStyles ={
-//   headCells: {
-//     style: {
-//       paddingLeft: '10%', // override the cell padding for head cells
-//       paddingRight: '10%',
-//     },
-//   },
-//   cells: {
-//     style: {
-//       paddingLeft: '1%', // override the cell padding for data cells
-//       paddingRight: '1%',
-//     },
-//   }
-// }
-const size = [2,5,10]
+const size = [2, 5, 10];
 class RecentActivity extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
       recentActivityDetails: [],
-      groupNames:[],
-      columns:[]
-        
-      
+      groupNames: [],
+      columns: [],
     };
   }
 
@@ -46,14 +30,14 @@ class RecentActivity extends Component {
       }
       if (this.props.recentActivityProps.recentActivity) {
         this.setState({
-                   recentActivityDetails: this.props.recentActivityProps.recentActivity.recentActivityDetails,
-
+          recentActivityDetails: this.props.recentActivityProps.recentActivity
+            .recentActivityDetails,
         });
       }
     }
   }
   getCurrentUserDetails = async () => {
-    this.props.getUserDetails()
+    this.props.getUserDetails();
     // axiosInstance.defaults.withCredentials = true;
     // const response1 = await axiosInstance
     //   .get("/groups/userDetails", {
@@ -66,20 +50,22 @@ class RecentActivity extends Component {
     //     });
     //   });
   };
-  getGroupNames = async() =>{
+  getGroupNames = async () => {
     axiosInstance.defaults.withCredentials = true;
+    axiosInstance.defaults.headers.common['authorization'] = JSON.parse(localStorage.getItem('token'));
+
     const response1 = await axiosInstance
       .get("/recentActivity/groupNames", {
         headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
       })
       .then((response) => {
         this.setState({
-          groupNames: response.data
-        })
+          groupNames: response.data,
+        });
       });
-  }
+  };
   getRecentActivity = async () => {
-this.props.getRecentActivityDetails();
+    this.props.getRecentActivityDetails();
     // axiosInstance.defaults.withCredentials = true;
     // const response1 = await axiosInstance
     //   .get("/recentActivity", {
@@ -92,84 +78,102 @@ this.props.getRecentActivityDetails();
     //     });
     //   });
   };
-  sortForMostRecentLast =async(e) =>{
+  sortForMostRecentLast = async (e) => {
     e.preventDefault();
-    let sortArray = [...this.state.recentActivityDetails]
+    let sortArray = [...this.state.recentActivityDetails];
 
     await sortArray.sort(function (a, b) {
       return new Date(a.created_at) - new Date(b.created_at);
     });
     this.setState({
-      recentActivityDetails: sortArray
-    })
-    
-  }
-  sortForMostRecentFirst =async(e) =>{
+      recentActivityDetails: sortArray,
+    });
+  };
+  sortForMostRecentFirst = async (e) => {
     e.preventDefault();
-    let sortArray = [...this.state.recentActivityDetails]
+    let sortArray = [...this.state.recentActivityDetails];
 
     await sortArray.sort(function (a, b) {
       return new Date(b.created_at) - new Date(a.created_at);
     });
     this.setState({
-      recentActivityDetails: sortArray
-    })
-    
-  }
-  filterGroups =async(e,name) =>{
+      recentActivityDetails: sortArray,
+    });
+  };
+  filterGroups = async (e, name) => {
     e.preventDefault();
-  //  await this.getRecentActivity(e);
-    let newArray = this.state.recentActivityDetails.filter(gname => gname.groupName == name)
+    //  await this.getRecentActivity(e);
+    let newArray = this.state.recentActivityDetails.filter(
+      (gname) => gname.groupName == name
+    );
     this.setState({
-      recentActivityDetails: newArray
-    })
-  }
+      recentActivityDetails: newArray,
+    });
+  };
   async componentDidMount() {
     const r2 = await this.getCurrentUserDetails();
     const r1 = await this.getRecentActivity();
     await this.getGroupNames();
 
-    this.state.columns= [
+    this.state.columns = [
       {
-          name: "Name",
-          selector:"payerName",
-          format: (row, index) => {
-            if(row.payerName ==JSON.parse(localStorage.getItem("user"))?.username){
-              return "You " 
-            }else{
-              return row.payerName
-            }
-            }
+        cell: (row) => (
+          <div>
+            <strong>
+              {row.payerName ==
+              JSON.parse(localStorage.getItem("user"))?.username
+                ? "You"
+                : row.payerName}{" "}
+            </strong>{" "}
+            Added <strong>{row.description}</strong> in{" "}
+            <strong>{row.groupName}</strong>
+            <p style={{ color: "red", textAlign:"left" }}>{row.amount>=1?"You Owe " + this.state.userDefaultCurrency + row.amount:""}</p>
+            <p style={{ color: "green",textAlign:"left" }}>{row.amount<0?"You Get Back "+ this.state.userDefaultCurrency + row.amount * -1:""}</p>
+            <p>{row.amount==0? "This transaction is settled": "" }</p>
+          </div>
+        ),
+        // format: (row, index) => {
+        //   let str = "";
+        //   if (
+        //     row.payerName == JSON.parse(localStorage.getItem("user"))?.username
+        //   ) {
+        //     str += "You " + "Added " + row.description + " in " + row.groupName;
+        //   } else {
+        //     str +=
+        //       row.payerName +
+        //       " Added " +
+        //       row.description +
+        //       "in " +
+        //       row.groupName;
+        //   }
+        //   if (row.amount >= 1) {
+        //     str += `\n You Owe ${this.state.userDefaultCurrency}` + row.amount;
+        //   } else if (row.amount < 0) {
+        //     str +=
+        //       ` \n You Get Back ${this.state.userDefaultCurrency}` +
+        //       row.amount * -1;
+        //   } else {
+        //     str += ` This transaction is settled`;
+        //   }
+        //   return str;
+        // },
       },
-      {
-        name: "Description",
-        selector:"description",
-        format: (row, index) => {
-          return "Added " +row.description
-          }
-      },
-      {
-        name: "Group Name",
-        selector:"groupName",
-        format: (row, index) => {
-          return "in " + row.groupName
-          }
-      },
-      {
-        name: "Amount",
-        selector:"amount",
-        format: (row, index) => {
-          if(row.amount>=1){
-            return `You Owe ${this.state.userDefaultCurrency}` + row.amount
-          }else if(row.amount<0){
-            return `You Get Back ${this.state.userDefaultCurrency}` + row.amount * -1
-          }
-          else{
-            return ` This transaction is settled`;
-          }
-          }
-      },
-      ]
+      // {
+      //   name: "Description",
+      //   selector:"description",
+      //   format: (row, index) => {
+      //     return
+      //     }
+      // },
+      // {
+      //   name: "Group Name",
+      //   selector:"groupName",
+      //   format: (row, index) => {
+      //     return "in " + row.groupName
+      //     }
+      // },
+      // {
+    ];
   }
   render() {
     let amountCheck = (value) => {
@@ -214,10 +218,22 @@ this.props.getRecentActivityDetails();
             </Col>
             <Col xs="2" style={{ backgroundColor: "lightgray" }}>
               <DropdownButton id="dropdown-basic-button" title="Groups">
-                {this.state.groupNames.map((name,index) =>(
-                  <Dropdown.Item onClick={(e)=>{this.filterGroups(e,name)}}>{name}</Dropdown.Item>
+                {this.state.groupNames.map((name, index) => (
+                  <Dropdown.Item
+                    onClick={(e) => {
+                      this.filterGroups(e, name);
+                    }}
+                  >
+                    {name}
+                  </Dropdown.Item>
                 ))}
-                <Dropdown.Item onClick={(e)=>{this.getRecentActivity(e)}}>All</Dropdown.Item>
+                <Dropdown.Item
+                  onClick={(e) => {
+                    this.getRecentActivity(e);
+                  }}
+                >
+                  All
+                </Dropdown.Item>
               </DropdownButton>
             </Col>
             <Col xs="1" style={{ backgroundColor: "lightgray" }}>
@@ -228,21 +244,36 @@ this.props.getRecentActivityDetails();
                 id="dropdown-basic-button"
                 title="Most recent on top"
               >
-                <Dropdown.Item onClick={(e)=>{this.sortForMostRecentLast(e)}}>Most recent Last</Dropdown.Item>
-                <Dropdown.Item onClick={(e)=>{this.sortForMostRecentFirst(e)}}>Most recent First</Dropdown.Item>
+                <Dropdown.Item
+                  onClick={(e) => {
+                    this.sortForMostRecentLast(e);
+                  }}
+                >
+                  Most recent Last
+                </Dropdown.Item>
+                <Dropdown.Item
+                  onClick={(e) => {
+                    this.sortForMostRecentFirst(e);
+                  }}
+                >
+                  Most recent First
+                </Dropdown.Item>
               </DropdownButton>
             </Col>
           </Row>
           <Row>
             <Col xs="2"></Col>
-            <DataTable
-            columns={this.state.columns}
-            data={this.state.recentActivityDetails}
-            paginationRowsPerPageOptions={size}
-            paginationPerPage={2}
-            	// customStyles={customStyles}
-            pagination
-            />
+            <Col >
+              {" "}
+              <DataTable
+                columns={this.state.columns}
+                data={this.state.recentActivityDetails}
+                paginationRowsPerPageOptions={size}
+                paginationPerPage={2}
+                // customStyles={customStyles}
+                pagination
+              />
+            </Col>
             {/* <Col style={{ textAlign: "left" }}>
               {this.state.recentActivityDetails.length > 0 &&
                 this.state.recentActivityDetails.map((group, index) => (
@@ -282,6 +313,6 @@ const mapStateToProps = (state, props) => {
 
 const actionCreators = {
   getUserDetails: RecentActivityAction.currentUserDetails,
-  getRecentActivityDetails: RecentActivityAction.getRecentActivity
+  getRecentActivityDetails: RecentActivityAction.getRecentActivity,
 };
 export default connect(mapStateToProps, actionCreators)(RecentActivity);

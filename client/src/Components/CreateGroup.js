@@ -12,6 +12,8 @@ import ListGroup from "react-bootstrap/ListGroup";
 import { Alert } from "react-bootstrap";
 import { Redirect } from "react-router";
 import axiosInstance from "../helpers/axios";
+import { connect } from "react-redux";
+import { CreateGroupAction } from "../redux/createGroup/createGroupAction";
 
 class CreateGroup extends Component {
   constructor(props) {
@@ -38,6 +40,33 @@ class CreateGroup extends Component {
       createGroupFlag: true,
     };
   }
+  async componentDidUpdate (prevProps) {
+    if (prevProps.createGroupProps !== this.props.createGroupProps) {
+      if (this.props.createGroupProps.receivedEmails) {
+        this.setState({
+          results2: this.props.createGroupProps.receivedEmails.results2,
+        });
+      }
+      if (this.props.createGroupProps.receivedNames) {
+         this.setState({
+          results: this.props.createGroupProps.receivedNames.result,
+        });
+      }
+      if (this.props.createGroupProps.groupCreateFlag) {
+        this.setState({
+          groupCreatedMessage: "Group Created Successfully",
+          groupCreateFlag: true,
+        });
+      }
+      if (this.props.createGroupProps.errorFlag) {
+        console.log("error")
+        this.setState({
+          errorMessage: "Group Already exists with the same name",
+            errorFlag: true,
+        });
+      }
+    }
+  }
   componentDidMount() {
     this.setState({
       currentUserName: JSON.parse(localStorage.getItem("user"))?.username,
@@ -45,26 +74,12 @@ class CreateGroup extends Component {
     });
   }
   getInfo2 = () => {
-    axiosInstance.defaults.withCredentials = true;
     let typedEmail = { email: this.state.query2 };
-    const response = axiosInstance
-      .post("/creategroup/getEmail", typedEmail)
-      .then((response) => {
-        this.setState({
-          results2: response.data,
-        });
-      });
+    this.props.getEmail(typedEmail);
   };
   getInfo = () => {
-    axiosInstance.defaults.withCredentials = true;
     let typedName = { name: this.state.query };
-    const response = axiosInstance
-      .post("/creategroup/getName", typedName)
-      .then((response) => {
-        this.setState({
-          results: response.data,
-        });
-      });
+    this.props.getName(typedName);
   };
   onTodoGroupNameChange(value) {
     this.setState(
@@ -136,28 +151,32 @@ class CreateGroup extends Component {
       users: userid,
     };
     console.log(groupData);
-    axiosInstance.defaults.withCredentials = true;
-    const response = axiosInstance
-      .post("/creategroup", groupData, {
-        headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
-      })
-      .then((response) => {
-        console.log("success");
-        this.setState({
-          groupCreatedMessage: response.data.msg,
-          groupCreateFlag: true,
-          redirectF: true,
-        });
-      })
-      .catch((err) => {
-        if (err.response.status === 400) {
-          console.log(err.response);
-          this.setState({
-            errorMessage: "Group Already exists with the same name",
-            errorFlag: true,
-          });
-        }
-      });
+    this.props.createGroup(groupData);
+
+    // axiosInstance.defaults.withCredentials = true;
+    // axiosInstance.defaults.headers.common['authorization'] = JSON.parse(localStorage.getItem('token'));
+    // const response = axiosInstance
+    //   .post("/creategroup", groupData, {
+    //     headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
+    //   })
+    //   .then((response) => {
+    //     console.log("success");
+    //     this.setState({
+    //       groupCreatedMessage: response.data.msg,
+    //       groupCreateFlag: true,
+    //       redirectF: true,
+    //     });
+    //   })
+
+    // .catch((err) => {
+    //   if (err.response.status === 400) {
+    //     console.log(err.response);
+    //     this.setState({
+    //       errorMessage: "Group Already exists with the same name",
+    //       errorFlag: true,
+    //     });
+    //   }
+    // });
   };
   handleInputEmailChange = () => {
     this.setState(
@@ -229,8 +248,10 @@ class CreateGroup extends Component {
         if (this.state.query && this.state.query.length >= 1) {
           this.getInfo();
         }
+
+
         //store only when the suggested list length is 1
-        if (this.state.results.length == 1) {
+        if (this.state.results && this.state.results.length == 1) {
           //check whether the last suggested name and entered name are same then set state for final values
           if (this.state.query == this.state.results[0].name) {
             //if userDetails has no data then directly add from else part
@@ -298,8 +319,9 @@ class CreateGroup extends Component {
       setTimeout(() => {
         this.setState({
           groupCreateFlag: false,
+          redirectF: true
         });
-      }, 12000);
+      }, 12500);
     };
     const renderError = () => {
       if (this.state.errorFlag) {
@@ -309,7 +331,7 @@ class CreateGroup extends Component {
         this.setState({
           errorFlag: false,
         });
-      }, 12000);
+      }, 15000);
     };
 
     const redirectCheck = () => {
@@ -427,5 +449,15 @@ class CreateGroup extends Component {
     );
   }
 }
+const mapStateToProps = (state, props) => {
+  return {
+    createGroupProps: state.createGroupState,
+  };
+};
 
-export default CreateGroup;
+const actionCreators = {
+  getEmail: CreateGroupAction.getEmail,
+  getName: CreateGroupAction.getName,
+  createGroup: CreateGroupAction.createGroup,
+};
+export default connect(mapStateToProps, actionCreators)(CreateGroup);

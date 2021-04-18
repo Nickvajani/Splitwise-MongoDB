@@ -13,6 +13,8 @@ export const groupService = {
 async function groupExpense(data) {
   let id = data;
   axiosInstance.defaults.withCredentials = true;
+  axiosInstance.defaults.headers.common['authorization'] = JSON.parse(localStorage.getItem('token'));
+
   const response = await axiosInstance
     .get("/groups/expenses", {
       params: {
@@ -30,6 +32,8 @@ async function groupExpense(data) {
 }
 async function userDetails() {
   axiosInstance.defaults.withCredentials = true;
+  axiosInstance.defaults.headers.common['authorization'] = JSON.parse(localStorage.getItem('token'));
+
   const response = await axiosInstance
     .get("/groups/userDetails", {
       headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
@@ -45,6 +49,8 @@ async function userDetails() {
 async function groupDetails(data) {
   let id = data;
   axiosInstance.defaults.withCredentials = true;
+  axiosInstance.defaults.headers.common['authorization'] = JSON.parse(localStorage.getItem('token'));
+
   const response = await axiosInstance
     .get("/groups/groupDetails", {
       params: {
@@ -62,6 +68,8 @@ async function groupDetails(data) {
 async function groupOweDetails(data) {
   let id = data;
   axiosInstance.defaults.withCredentials = true;
+  axiosInstance.defaults.headers.common['authorization'] = JSON.parse(localStorage.getItem('token'));
+
   const response = axiosInstance
     .get("/groups/owe", {
       params: {
@@ -80,6 +88,7 @@ async function groupOweDetails(data) {
 async function addExpense(data) {
     let id = data.group_id;
     console.log(data)
+    axiosInstance.defaults.headers.common['authorization'] = JSON.parse(localStorage.getItem('token'));
   const response = axiosInstance
     .post("/groups/addExpense/" + id, data, {
       headers: {
@@ -98,6 +107,8 @@ async function addExpense(data) {
 
 async function addComment(data) {
   axiosInstance.defaults.withCredentials = true;
+  axiosInstance.defaults.headers.common['authorization'] = JSON.parse(localStorage.getItem('token'));
+
         const response = await axiosInstance.post("/groups/comment" ,data,{
           headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
         }).then((response) => {
@@ -110,7 +121,7 @@ async function addComment(data) {
 }
 async function deleteComment(data) {
   axiosInstance.defaults.withCredentials = true;
-    axiosInstance.defaults.headers.common['authorization'] = localStorage.getItem('token');
+  axiosInstance.defaults.headers.common['authorization'] = JSON.parse(localStorage.getItem('token'));
     const response = await axiosInstance
       .delete("/groups/deleteComment/" + data.c_id,  {
         headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },

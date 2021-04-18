@@ -1,10 +1,12 @@
 const express = require("express");
 const router = express.Router();
+const {checkAuth} = require("../../config/passport")
+
 
 let Group = require("../../models/createGroupModel");
 const Transaction = require("../../models/transactionModel");
 
-router.get("/invites", (req, res) => {
+router.get("/invites", checkAuth , (req, res) => {
   var current_user = req.header("user");
   console.log(current_user);
 
@@ -33,7 +35,7 @@ router.get("/invites", (req, res) => {
   );
 });
 
-router.put("/:id/accept", (req, res) => {
+router.put("/:id/accept", checkAuth , (req, res) => {
   console.log("from accept");
   var current_user = req.header("user");
   var group_id = req.params.id;
@@ -59,7 +61,7 @@ router.put("/:id/accept", (req, res) => {
   );
 });
 
-router.get("/joined", (req, res) => {
+router.get("/joined", checkAuth , (req, res) => {
   var current_user = req.header("user");
   Group.find(
     {
@@ -86,7 +88,7 @@ router.get("/joined", (req, res) => {
   );
 });
 
-router.post("/getGroups", (req, res) => {
+router.post("/getGroups", checkAuth , (req, res) => {
   var current_user = req.header("user");
  
   Group.find(
@@ -113,7 +115,7 @@ router.post("/getGroups", (req, res) => {
   );
 });
 
-router.delete("/leave/:g_id", async (req,res) => {
+router.delete("/leave/:g_id", checkAuth , async (req,res) => {
   var current_user = req.header("user");
   Transaction.find({"ower.u_id" : current_user,"ower.is_settled":false , g_id: req.params.g_id} ,async(err,result) =>{
     if(err){

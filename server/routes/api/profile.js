@@ -1,9 +1,11 @@
 const express = require("express");
 const router = express.Router();
+const {checkAuth} = require("../../config/passport")
+
 
 let User = require("../../models/userModel");
 
-router.put("/update", (req, res) => {
+router.put("/update", checkAuth , (req, res) => {
    console.log("update")
     console.log(req.body)
     User.findByIdAndUpdate(
@@ -29,7 +31,7 @@ router.put("/update", (req, res) => {
   );
 });
 
-router.post("/get", (req, res) => {
+router.post("/get", checkAuth , (req, res) => {
   console.log(req.body)
     User.find({email:req.body.email},(err,result) => {
         if(err){

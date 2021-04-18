@@ -100,7 +100,7 @@ class Dashboard extends Component {
   }
   getNumberOfGroups = async () => {
     axiosInstance.defaults.withCredentials = true;
-    axiosInstance.defaults.headers.common['authorization'] = localStorage.getItem('token');
+    axiosInstance.defaults.headers.common['authorization'] = JSON.parse(localStorage.getItem('token'));
     const response4 = await axiosInstance
       .get("/dashboard/getGroupsId", {
         headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
@@ -132,7 +132,7 @@ class Dashboard extends Component {
   };
   getGroupNames = async (value) => {
     axiosInstance.defaults.withCredentials = true;
-    axiosInstance.defaults.headers.common['authorization'] = localStorage.getItem('token');
+    axiosInstance.defaults.headers.common['authorization'] = JSON.parse(localStorage.getItem('token'));
 
     const response5 = await axiosInstance
       .get("/dashboard/getGroupNames", {
@@ -152,7 +152,7 @@ class Dashboard extends Component {
   };
   getGroupDetails = async (value) => {
     axiosInstance.defaults.withCredentials = true;
-    axiosInstance.defaults.headers.common['authorization'] = localStorage.getItem('token');
+    axiosInstance.defaults.headers.common['authorization'] = JSON.parse(localStorage.getItem('token'));
 
     const response4 = await axiosInstance
       .get("/groups/owe", {

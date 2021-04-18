@@ -7,6 +7,8 @@ export const myProfileService = {
 
 async function getProfile(data) {
   axiosInstance.defaults.withCredentials = true;
+  axiosInstance.defaults.headers.common['authorization'] = JSON.parse(localStorage.getItem('token'));
+
   const response = await axiosInstance
     .post("/profile/get", data)
     .then((response) => {
@@ -28,6 +30,8 @@ async function getProfile(data) {
 
 async function setProfile(data) {
   axiosInstance.defaults.withCredentials = true;
+  axiosInstance.defaults.headers.common['authorization'] = JSON.parse(localStorage.getItem('token'));
+
   const response = axiosInstance
     .put("/profile/update", data, {
       headers: { user: JSON.parse(localStorage.getItem("user"))?._id },

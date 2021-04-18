@@ -34,7 +34,7 @@ class ProfilePage extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    console.log(this.props.profileProps)
+    // console.log(this.props.profileProps)
     if (prevProps.profileProps !== this.props.profileProps) {
       this.setState(
         {
@@ -45,12 +45,9 @@ class ProfilePage extends Component {
           phoneNumber: this.props.profileProps.user.phoneNumber || "",
           timezone: this.props.profileProps.user.timezone || "",
           language: this.props.profileProps.user.language || "",
-          imageName: this.props.profileProps.user.imageName || ""
-        },
-        () => {
-          console.log("from main page " + this.state.imageName);
-        }
-      );
+          imageName: this.props.profileProps.user.imageName || "",
+          redirectF: this.props.profileProps.redirectF 
+        });
     }
   }
 
@@ -107,7 +104,7 @@ class ProfilePage extends Component {
   }
   onTodoPhoneChange = (e) => {
     const re = /^[0-9\b]+$/;
-    // const re=  /\d*/
+    
     // if value is not blank, then test the regex
     if (e.target.value === "" || re.test(e.target.value)) {
       this.setState({
@@ -170,14 +167,14 @@ class ProfilePage extends Component {
 
   render() {
     const redirectCheck = () => {
-      if (this.props.profileProps.redirectF) {
+      if (this.state.redirectF) {
+        this.setState({
+        redirectF: false
+        })
         return <Redirect to={{ pathname: "/dashboard" }}></Redirect>;
       }
     };
-    // let sess = JSON.parse(localStorage.getItem("user"))?.email;
-    // if (sess == null) {
-    //   return <Redirect to="/login"></Redirect>;
-    // }
+    
 
     return (
       <div>

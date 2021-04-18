@@ -16,7 +16,6 @@ const FileUpload = (props) => {
     if (props.imageName != "") {
       const filePath = props.imageName;
       setFileNameFromProps(filePath);
-      console.log("from props: " +fileNameFromProps)
     }
   });
  
