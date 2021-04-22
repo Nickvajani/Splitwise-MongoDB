@@ -46,6 +46,7 @@ async function userDetails() {
     });
   return response;
 }
+//removed 
 async function groupDetails(data) {
   let id = data;
   axiosInstance.defaults.withCredentials = true;

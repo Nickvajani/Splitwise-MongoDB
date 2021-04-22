@@ -45,6 +45,8 @@ class Group extends Component {
       commentsFetched: [],
       deleteFlag: false,
       deleteMessage: "",
+      idToDelete:'',
+      deleteModal: false
     };
   }
   componentDidUpdate(prevProps) {
@@ -103,6 +105,7 @@ class Group extends Component {
       }
       if(this.props.groupProps.deleteCommentFlag){
         this.setState({
+          deleteModal: false,
           viewComment: false,
           deleteFlag: true,
           deleteMessage: "Comment Deleted Successfully",
@@ -116,10 +119,11 @@ class Group extends Component {
   componentDidMount(props) {
     this.setState({
       group_id: this.props.location.state.g_id,
+      groupname: this.props.location.state.name
     });
     this.getGroupExpense();
     this.getCurrentUserDetails();
-    this.getCurrentGroupDetails();
+    // this.getCurrentGroupDetails();
     this.getOweDetails();
   }
   getGroupExpense = () => {
@@ -131,10 +135,10 @@ class Group extends Component {
     this.props.getUserDetails();
   };
 
-  getCurrentGroupDetails = () => {
-    let data = this.props.location.state.g_id;
-    this.props.groupDetails(data);
-  };
+  // getCurrentGroupDetails = () => {
+  //   let data = this.props.location.state.g_id;
+  //   this.props.groupDetails(data);
+  // };
   getOweDetails = () => {
     let data = this.props.location.state.g_id;
     this.props.getOweDetails(data);
@@ -188,6 +192,11 @@ class Group extends Component {
   hideViewCommentModal= () =>{
     this.setState({
       viewComment: false
+    })
+  }
+  hideDeleteConfirmationModal =()=>{
+    this.setState({
+      deleteModal:false
     })
   }
   hideModal = () => {
@@ -304,6 +313,15 @@ class Group extends Component {
       console.log(this.state.commentsFetched)
     })
   }
+  deleteComfirmation = async(e,id)=>{
+    this.setState({
+      idToDelete: id,
+      deleteModal:true
+    })
+
+  }
+
+
   deleteComment =async(e,id)=>{
     e.preventDefault();
     console.log(id)
@@ -501,7 +519,7 @@ class Group extends Component {
                       <Col xs="2" style={{textAlign:"left"}}>{comments.name}:</Col>
                       <Col xs="6" style={{textAlign:"left"}}>{comments.comment}</Col>
                       <Col xs="2">{this.convertDate(comments.created_at)}</Col>
-                      <Col xs="1">{String(comments.name) == String(JSON.parse(localStorage.getItem("user"))?.username)?<FontAwesomeIcon icon={faTrash} onClick={(e) =>{this.deleteComment(e,comments.id)}}/>:null}</Col>
+                      <Col xs="1">{String(comments.name) == String(JSON.parse(localStorage.getItem("user"))?.username)?<FontAwesomeIcon icon={faTrash} onClick={(e) =>{this.deleteComfirmation(e,comments.id)}}/>:null}</Col>
                     </Row>
                   </div>
                 ))}
@@ -512,6 +530,26 @@ class Group extends Component {
                 <Button variant="secondary" onClick={this.hideViewCommentModal}>
                   Close
                 </Button>
+               
+              </Modal.Footer>
+            </Modal>
+
+            <Modal show={this.state.deleteModal} onHide={this.hideDeleteConfirmationModal}>
+                <Modal.Header closeButton>
+                <Modal.Title>Delete Comment</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+              Permanently delete this comment?<br></br>
+                <Button variant="secondary" style={{marginRight:"10px"}} onClick={this.hideDeleteConfirmationModal}>
+                  NO
+                </Button>
+                <Button variant="secondary" onClick={(e) =>{this.deleteComment(e,this.state.idToDelete)}}>
+                  yes
+                </Button>
+              </Modal.Body>
+              <Modal.Footer>
+                {renderError()}
+                {renderSuccess()}
                
               </Modal.Footer>
             </Modal>

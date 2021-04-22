@@ -192,6 +192,8 @@ class CreateGroup extends Component {
         if (this.state.results2.length == 1) {
           //check whether the last suggested name and entered name are same then set state for final values
           if (this.state.query2 == this.state.results2[0].email) {
+            console.log("checking")
+
             //if userDetails has no data then directly add from else part
             if (this.state.userDetails.length != 0) {
               for (let i = 0; i < this.state.userDetails.length; i++) {
@@ -200,6 +202,7 @@ class CreateGroup extends Component {
                   this.state.query2 != this.state.userDetails[i].name &&
                   this.state.query2 != this.state.currentUserEmail
                 ) {
+                  console.log("matched")
                   this.setState({
                     finalId: this.state.results2[0].id,
                     finalName: this.state.results2[0].name,
@@ -301,15 +304,15 @@ class CreateGroup extends Component {
   };
 
   render() {
-    if (!JSON.parse(localStorage.getItem("user"))) {
-      return (
-        <Redirect
-          to={{
-            pathname: "/login",
-          }}
-        ></Redirect>
-      );
-    }
+    // if (!JSON.parse(localStorage.getItem("user"))) {
+    //   return (
+    //     <Redirect
+    //       to={{
+    //         pathname: "/login",
+    //       }}
+    //     ></Redirect>
+    //   );
+    // }
     const renderSuccess = () => {
       if (this.state.groupCreateFlag) {
         return (
@@ -319,10 +322,11 @@ class CreateGroup extends Component {
       setTimeout(() => {
         this.setState({
           groupCreateFlag: false,
-          redirectF: true
+          // redirectF: true
         });
       }, 12500);
     };
+   
     const renderError = () => {
       if (this.state.errorFlag) {
         return <Alert variant="danger">{this.state.errorMessage}</Alert>;
@@ -336,6 +340,9 @@ class CreateGroup extends Component {
 
     const redirectCheck = () => {
       if (this.state.redirectF) {
+        this.setState({
+          redirectF: false
+        })
         return <Redirect to={{ pathname: "/dashboard" }}></Redirect>;
       }
     };

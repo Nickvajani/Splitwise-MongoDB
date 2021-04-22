@@ -7,6 +7,11 @@ import axiosInstance from "../helpers/axios";
 import { connect } from "react-redux";
 import { RecentActivityAction } from "../redux/recentActivity/RecentActivityAction";
 import DataTable from "react-data-table-component";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faShoppingCart } from '@fortawesome/free-solid-svg-icons'
+import { faMoneyBill } from '@fortawesome/free-solid-svg-icons'
+
+
 
 const size = [2, 5, 10];
 class RecentActivity extends Component {
@@ -118,19 +123,21 @@ class RecentActivity extends Component {
     this.state.columns = [
       {
         cell: (row) => (
-          <div>
+          <div><big>
+            {row.amount!=0?<FontAwesomeIcon icon={faShoppingCart } fa-7x></FontAwesomeIcon>:<FontAwesomeIcon icon={faMoneyBill} fa-7x></FontAwesomeIcon>}
             <strong>
               {row.payerName ==
               JSON.parse(localStorage.getItem("user"))?.username
-                ? "You"
-                : row.payerName}{" "}
+                ? " You"
+                : " " +row.payerName}{" "}
             </strong>{" "}
             Added <strong>{row.description}</strong> in{" "}
             <strong>{row.groupName}</strong>
+            
             <p style={{ color: "red", textAlign:"left" }}>{row.amount>=1?"You Owe " + this.state.userDefaultCurrency + row.amount:""}</p>
             <p style={{ color: "green",textAlign:"left" }}>{row.amount<0?"You Get Back "+ this.state.userDefaultCurrency + row.amount * -1:""}</p>
-            <p>{row.amount==0? "This transaction is settled": "" }</p>
-          </div>
+            <p  style={{ textAlign:"left" }}>{row.amount==0? "This transaction is settled": "" }</p>
+            </big> </div>
         ),
         // format: (row, index) => {
         //   let str = "";
@@ -264,8 +271,7 @@ class RecentActivity extends Component {
           <Row>
             <Col xs="2"></Col>
             <Col >
-              {" "}
-              <DataTable
+              <DataTable 
                 columns={this.state.columns}
                 data={this.state.recentActivityDetails}
                 paginationRowsPerPageOptions={size}

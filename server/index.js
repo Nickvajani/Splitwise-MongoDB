@@ -32,7 +32,6 @@ app.use(express.urlencoded({ extended: false }));
 
 //DB Config
 const db = require('./config/keys').mongoURI;
-const Group = require("./models/createGroupModel");
 
 //connect to Mongo
 mongoose

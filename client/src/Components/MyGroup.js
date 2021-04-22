@@ -28,6 +28,7 @@ class MyGroup extends Component {
       leaveGroupFlag: false,
       joinGroupFlag: false,
       successMessage: "",
+      gottoGroupName: ''
     };
   }
 
@@ -60,6 +61,8 @@ class MyGroup extends Component {
         this.setState({
           successMessage: "Group left!!",
           leaveGroupFlag: true,
+        },()=>{
+          this.joinedGroup()
         });
       }
       if (this.props.myGroupsProps.errorFlag) {
@@ -127,11 +130,12 @@ class MyGroup extends Component {
     this.props.joinGroup(idvalue);
     this.joinedGroup();
   };
-  setRedirect = (e, value) => {
+  setRedirect = (e, value,name) => {
     e.preventDefault();
     this.setState({
       redirect: true,
       gotoGroupId: value,
+      gottoGroupName: name
     });
   };
   leaveGroup = async (e, value) => {
@@ -147,7 +151,7 @@ class MyGroup extends Component {
         <Redirect
           to={{
             pathname: "/group",
-            state: { g_id: this.state.gotoGroupId },
+            state: { g_id: this.state.gotoGroupId, name: this.state.gottoGroupName },
           }}
         ></Redirect>
       );
@@ -237,7 +241,7 @@ class MyGroup extends Component {
                         variant="primary"
                         size="sm"
                         onClick={(e) => {
-                          this.setRedirect(e, group.g_id);
+                          this.setRedirect(e, group.g_id,group.name);
                         }}
                         style={{marginBottom:"10px"}}
                       >

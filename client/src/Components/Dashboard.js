@@ -47,6 +47,8 @@ class Dashboard extends Component {
       if (this.props.dashboardProps.userOwe) {
         this.setState({
           userTotalOwe: this.props.dashboardProps.userOwe.userTotalOwe,
+        },()=>{
+          this.getUserGetBackAmount();
         });
       }
       if (this.props.dashboardProps.userGet) {
@@ -111,6 +113,7 @@ class Dashboard extends Component {
             numberOfGroups: response.data,
           },
           () => {
+            console.log("groups ids")
             console.log(this.state.numberOfGroups);
           }
         );
@@ -124,10 +127,15 @@ class Dashboard extends Component {
     let arr = [];
     for (let i = 0; i < this.state.numberOfGroups.length; i++) {
       let s = await this.getGroupDetails(this.state.numberOfGroups[i]);
+      console.log(s)
+     if(s!= null)
       arr.push(s);
     }
+    console.log(arr)
     this.setState({
       groupDetails: arr,
+    },()=>{
+      console.log(this.state.groupDetails)
     });
   };
   getGroupNames = async (value) => {
@@ -146,6 +154,7 @@ class Dashboard extends Component {
           this.state.groupNames.push(response.data);
         },
         () => {
+          // console.log("group Name")
           //   console.log(this.state.groupNames);
         }
       );
@@ -161,13 +170,22 @@ class Dashboard extends Component {
         },
       })
       .then((response) => {
-        console.log(response.data.length);
-        let s = {};
-        for (let obj of response.data) {
-          if (!s[obj.group_name]) s[obj.group_name] = [];
-          s[obj.group_name].push(obj);
+        // console.log(response.data);
+        // console.log(JSON.parse(localStorage.getItem("user"))?.username);
+        let s = {}
+        for(let i=0;i<response.data.length;i++){
+          if(response.data[i].name == JSON.parse(localStorage.getItem("user"))?.username){
+            for (let obj of response.data) {
+              if (!s[obj.group_name]) s[obj.group_name] = [];
+              s[obj.group_name].push(obj);
+            }
+          }
         }
+        if(Object.keys(s).length > 0)
         return s;
+        else
+        return null
+       
         // console.log(this.state.groupDetails)
         // this.state.groupDetails.push(response.data);
       });
@@ -193,7 +211,7 @@ class Dashboard extends Component {
     const r1 = await this.getCurrentUserDetails();
     const r2 = await this.getNumberOfGroups();
     const r3 = await this.getUserOweAmount();
-    const r4 = await this.getUserGetBackAmount();
+    // const r4 = await this.getUserGetBackAmount();
     // const r5 = await this.getUserTotal();
 
     //  this.dispGroupDetails();
@@ -398,7 +416,7 @@ class Dashboard extends Component {
         return ` Owe ${this.state.userDefaultCurrency} ${amount}`;
       } else {
         let newAmount = amount * -1;
-        return ` Gets back ${this.state.userDefaultCurrency} ${newAmount}`;
+        return ` Get back ${this.state.userDefaultCurrency} ${newAmount}`;
       }
     };
     let nameCheck = (value) => {
@@ -437,7 +455,7 @@ class Dashboard extends Component {
               </Button>
             </Col>
           </Row>
-          <Row>
+          <Row >
             <Col xs="2"></Col>
             <Col xs="3" style={UserStyle}>
               <p>total balances</p> {this.state.userDefaultCurrency}{" "}
@@ -507,21 +525,20 @@ class Dashboard extends Component {
             </Modal>
           </Form>
 
-          <Row>
+          <Row >
             <Col xs="2"></Col>
 
             <Col
               style={
-                ({ border: "1px solid rgba(0, 0, 0, 0.05)" },
-                { textAlign: "left" })
+                ({ border: "1px solid rgba(0, 0, 0, 0.05)" }
+                )
               }
             >
               <p>Details about each group</p>
-
               {this.state.groupDetails.length > 0 &&
                 this.state.groupDetails.map((group, index) => (
                   <div key={index}>
-                    <Row>
+                    <Row  style={{ border: "1px solid rgba(0, 0, 0, 0.09)" , textAlign:"left"}} >
                       <Col
                         xs="10"
                         style={
