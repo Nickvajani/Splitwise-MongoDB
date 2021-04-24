@@ -38,7 +38,6 @@ router.post('/' , (req,res) =>{
     })
       .promise()
       .then(response => {
-        // console.log(`done! - `, response)
         console.log(
           `The URL is ${s3.getSignedUrl('getObject', { Bucket: BUCKET, Key: uuid+'.'+ext })}`
         )

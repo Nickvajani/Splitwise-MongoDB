@@ -14,6 +14,7 @@ import { connect } from "react-redux";
 import { GroupsAction } from "../redux/group/groupAction";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faWallet } from '@fortawesome/free-solid-svg-icons'
 
 class Group extends Component {
   constructor(props) {
@@ -564,7 +565,7 @@ class Group extends Component {
                       <Row style={{ border: "1px solid rgba(0, 0, 0, 0.05)" }} >
                         <Col xs="3" onClick={(e) =>{this.showCommentModal(e,group.ID)}}>{this.convertDate(group.created_at)}</Col>
                         <Col xs="3" onClick={(e) =>{this.showCommentModal(e,group.ID)}} style={{ textTransform: "uppercase" }}>
-                          {group.description}
+                        <FontAwesomeIcon icon={faWallet} /> {group.description}
                         </Col>
                         <Col xs="3" style={{ textTransform: "uppercase" }} onClick={(e) =>{this.showCommentModal(e,group.ID)}}>
                           <small>{group.payer_name} paid</small>
@@ -572,7 +573,7 @@ class Group extends Component {
                           {this.state.userDefaultCurrency} {group.amount}
                         </Col>
                         <Col>
-                        <Button variant="primary"
+                        <Button variant="success"
                         size="sm"
                         onClick={(e) => {
                           this.viewComment(e, group.comments);

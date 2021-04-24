@@ -216,6 +216,7 @@ class MyGroup extends Component {
                           this.joinGroup(e, group.g_id);
                         }}
                         size="sm"
+                        style={{marginBottom:"10px"}}
                       >
                         Join
                       </Button>

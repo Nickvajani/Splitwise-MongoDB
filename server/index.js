@@ -21,10 +21,27 @@ const fileUploadRouter = require('./routes/api/fileupload')
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "http://18.210.28.216:3000",
     credentials: true,
   })
 );
+app.use(function (req, res, next) {
+  res.setHeader(
+    "Access-Control-Allow-Origin",
+    "18.210.28.216" 
+  );
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET,HEAD,OPTIONS,POST,PUT,DELETE"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers"
+  );
+  res.setHeader("Cache-Control", "no-cache");
+  next();
+});
 app.use(express.json());
 app.use(fileUpload());
 app.use(bodyParser.json());

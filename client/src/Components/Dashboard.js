@@ -7,6 +7,8 @@ import DashboardSuggestions from "./DashboardSuggestions";
 import axiosInstance from "../helpers/axios";
 import { connect } from "react-redux";
 import { DashboardAction } from "../redux/dashboard/dashboardAction";
+import { Alert } from "react-bootstrap";
+
 
 class Dashboard extends Component {
   constructor(props) {
@@ -128,8 +130,8 @@ class Dashboard extends Component {
     for (let i = 0; i < this.state.numberOfGroups.length; i++) {
       let s = await this.getGroupDetails(this.state.numberOfGroups[i]);
       console.log(s)
-     if(s!= null)
       arr.push(s);
+    //  if(s!= null)
     }
     console.log(arr)
     this.setState({
@@ -173,18 +175,19 @@ class Dashboard extends Component {
         // console.log(response.data);
         // console.log(JSON.parse(localStorage.getItem("user"))?.username);
         let s = {}
-        for(let i=0;i<response.data.length;i++){
-          if(response.data[i].name == JSON.parse(localStorage.getItem("user"))?.username){
+        // for(let i=0;i<response.data.length;i++){
+          // if(response.data[i].name == JSON.parse(localStorage.getItem("user"))?.username){
             for (let obj of response.data) {
               if (!s[obj.group_name]) s[obj.group_name] = [];
               s[obj.group_name].push(obj);
             }
-          }
-        }
-        if(Object.keys(s).length > 0)
+          //}
+        //}
+        console.log(s)
+        // if(Object.keys(s).length > 0)
         return s;
-        else
-        return null
+        // else
+        // return null
        
         // console.log(this.state.groupDetails)
         // this.state.groupDetails.push(response.data);
@@ -216,6 +219,8 @@ class Dashboard extends Component {
 
     //  this.dispGroupDetails();
     // this.getGroupNames();
+
+    
   }
   showModal = () => {
     this.setState({
@@ -410,6 +415,7 @@ class Dashboard extends Component {
       backgroundColor: "lightgray",
       border: "1px solid rgba(0, 0, 0, 0.05)",
     };
+
     let amountCheck = (value) => {
       let amount = parseFloat(value);
       if (amount >=1) {
@@ -429,6 +435,7 @@ class Dashboard extends Component {
     };
     return (
       <div>
+        
         <Container fluid>
           <Row>
             <Col xs="2">
@@ -470,7 +477,6 @@ class Dashboard extends Component {
               {this.state.userTotalGet}
             </Col>
           </Row>
-
           <Form>
             <Modal show={this.state.show} onHide={this.hideModal}>
               <Modal.Header closeButton>

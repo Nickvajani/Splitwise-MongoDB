@@ -56,6 +56,7 @@ class CreateGroup extends Component {
         this.setState({
           groupCreatedMessage: "Group Created Successfully",
           groupCreateFlag: true,
+          redirectF: true
         });
       }
       if (this.props.createGroupProps.errorFlag) {
@@ -322,9 +323,9 @@ class CreateGroup extends Component {
       setTimeout(() => {
         this.setState({
           groupCreateFlag: false,
-          // redirectF: true
         });
-      }, 12500);
+        redirectCheck();
+      }, 6500);
     };
    
     const renderError = () => {
@@ -335,7 +336,7 @@ class CreateGroup extends Component {
         this.setState({
           errorFlag: false,
         });
-      }, 15000);
+      }, 1000);
     };
 
     const redirectCheck = () => {
@@ -343,7 +344,7 @@ class CreateGroup extends Component {
         this.setState({
           redirectF: false
         })
-        return <Redirect to={{ pathname: "/dashboard" }}></Redirect>;
+        return <Redirect to={{ pathname: "/dashboard", state:{ groupCreateFlag: this.state.groupCreateFlag, groupCreatedMessage:this.state.groupCreatedMessage} }}></Redirect>;
       }
     };
 

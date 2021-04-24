@@ -65,8 +65,8 @@ function handleTopicRequest(topic_name,fname){
                     partition : 0
                 }
             ];
-            console.log("payload created")
-            console.log(payloads)
+            // console.log("payload created")
+            // console.log(payloads)
             producer.send(payloads, function(err, data){
                 console.log(data);
             });

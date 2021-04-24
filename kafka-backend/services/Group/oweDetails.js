@@ -39,7 +39,7 @@ async function handle_request(msg, callback) {
           .then((user) => {
             if (user.length > 0) {
               let amounts = {};
-              amounts["amount_owed"] = 0.0;
+              amounts["amount_owed"] = 0.0 ;
               // amounts["group_name"] = user[0].g_id.g_name
               for (let i = 0; i < user.length; i++) {
                 for (let j = 0; j < user[i].ower.length; j++) {
@@ -50,23 +50,30 @@ async function handle_request(msg, callback) {
                   ) {
                     amounts["name"] = user[i].ower[j].u_id.name;
                     amounts["ower_id"] = user[i].ower[j].u_id._id;
-                    amounts["amount_owed"] += user[i].ower[j].amount;
+                    amounts["amount_owed"] = (amounts["amount_owed"]*10000 + user[i].ower[j].amount*10000)/10000;
                     amounts["group_name"] = user[0].g_id.g_name;
                   }
                 }
               }
+              //whenever the settlement is done, there will be an object "amounts" created which will only have amount_owed as key and by default value 0 so to avoid that object from getting pushed  
+              if(Object.keys(amounts).length > 1)
               resolve(amounts);
+              else 
+              resolve(null)
             } else {
               resolve(null);
             }
           });
       });
+      // if(Object.keys(owersObj).length > 1){
+      //   totalAmounts.push(owersObj)
+      // }
       if (owersObj != null) {
         totalAmounts.push(owersObj);
       }
     }
-    // console.log("Owe details")
-    // console.log(totalAmounts);
+    console.log("Owe details")
+    console.log(totalAmounts);
     //to find the users who are just the payers and do not owe anything
     let res4 = await new Promise(async (resolve, reject) => {
       let newMembers = [];
@@ -120,14 +127,14 @@ async function handle_request(msg, callback) {
           .then((user) => {
             if (user.length > 0) {
               let amounts = {};
-              amounts["amount_toGetBack"] = 0.0;
+              amounts["amount_toGetBack"] = 0.00;
               //   amounts["sumOfOwers"] = 0.0;
               // console.log(user[0])
               for (let i = 0; i < user.length; i++) {
                 if (String(user[i].payer_id._id) === String(memberList[z])) {
                   for (j = 0; j < user[i].ower.length; j++) {
                     if (user[i].ower[j].is_settled == false) {
-                      amounts["amount_toGetBack"] += user[i].ower[j].amount;
+                      amounts["amount_toGetBack"] = (amounts["amount_toGetBack"] * 1000 + user[i].ower[j].amount * 1000)/1000;
                     }
                   }
                   //   console.log(amounts)
