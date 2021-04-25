@@ -21,14 +21,14 @@ const fileUploadRouter = require('./routes/api/fileupload')
 
 app.use(
   cors({
-    origin: "http://18.210.28.216",
+    origin: "http://18.210.28.216:3000",
     credentials: true,
   })
 );
 app.use(function (req, res, next) {
   res.setHeader(
     "Access-Control-Allow-Origin",
-    "18.210.28.216" 
+    "http://18.210.28.216:3000" 
   );
   res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader(
