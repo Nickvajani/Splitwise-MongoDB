@@ -21,7 +21,7 @@ const fileUploadRouter = require('./routes/api/fileupload')
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "http://18.210.28.216",
     credentials: true,
   })
 );
