@@ -4,9 +4,6 @@ const {checkAuth} = require("../../config/passport")
 var kafka = require('../../kafka/client');
 
 
-let Group = require("../../models/createGroupModel");
-let User = require("../../models/userModel");
-
 router.post("/getName", checkAuth , (req, res) => {
   let name = req.body.name;
 

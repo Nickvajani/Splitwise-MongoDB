@@ -3,7 +3,6 @@ const router = express.Router();
 const {checkAuth} = require("../../config/passport")
 var kafka = require('../../kafka/client');
 
-let User = require("../../models/userModel");
 
 router.put("/update", checkAuth , (req, res) => {
 

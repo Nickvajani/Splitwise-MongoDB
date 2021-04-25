@@ -3,9 +3,6 @@ const router = express.Router();
 const {checkAuth} = require("../../config/passport")
 var kafka = require('../../kafka/client');
 
-let User = require("../../models/userModel");
-let Group = require("../../models/createGroupModel");
-let Transaction = require("../../models/transactionModel");
 
 router.get("/getGroupsId", checkAuth ,(req, res) => {
   var current_user = req.header("user");

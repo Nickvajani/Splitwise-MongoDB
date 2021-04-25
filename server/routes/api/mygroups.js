@@ -4,8 +4,7 @@ const {checkAuth} = require("../../config/passport")
 var kafka = require('../../kafka/client');
 
 
-let Group = require("../../models/createGroupModel");
-const Transaction = require("../../models/transactionModel");
+
 
 router.get("/invites", checkAuth , (req, res) => {
   var current_user = req.header("user");
@@ -224,17 +223,17 @@ router.delete("/leave/:g_id", checkAuth , async (req,res) => {
 })
 
 
-const leaveGroup = async (g_id, current_user) => {
-  Group.findOneAndUpdate({_id:g_id },{$pull:{members:{ID:current_user}}},{multi:true} ,(err,result) => {
-    if (result) {
-      console.log(result)
-      return { msg: "You left the group successfully" };
-    }else{
-      console.log(err)
-    }
-  })
+// const leaveGroup = async (g_id, current_user) => {
+//   Group.findOneAndUpdate({_id:g_id },{$pull:{members:{ID:current_user}}},{multi:true} ,(err,result) => {
+//     if (result) {
+//       console.log(result)
+//       return { msg: "You left the group successfully" };
+//     }else{
+//       console.log(err)
+//     }
+//   })
   
-};
+// };
 
 module.exports = router;
 
