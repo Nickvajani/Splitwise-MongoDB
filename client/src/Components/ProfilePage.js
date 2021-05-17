@@ -11,6 +11,7 @@ import { Redirect } from "react-router";
 import FileUpload from "./FileUpload";
 import axiosInstance from "../helpers/axios";
 import { connect } from "react-redux";
+import { Alert } from "react-bootstrap";
 import { ProfilePageAction } from "../redux/profilepage/ProfilePageAction";
 
 class ProfilePage extends Component {
@@ -29,15 +30,16 @@ class ProfilePage extends Component {
       useremail: "",
       redirectF: false,
       imageName: "",
-
+      errorMessage: "",
+      errorFlag: false,
     };
   }
 
   componentDidUpdate(prevProps) {
     // console.log(this.props.profileProps)
     if (prevProps.profileProps !== this.props.profileProps) {
-      this.setState(
-        {
+      if (this.props.profileProps.profileUpdated) {
+        this.setState({
           id: this.props.profileProps.user.id || "",
           email: this.props.profileProps.user.email || "",
           username: this.props.profileProps.user.username || "",
@@ -46,8 +48,18 @@ class ProfilePage extends Component {
           timezone: this.props.profileProps.user.timezone || "",
           language: this.props.profileProps.user.language || "",
           imageName: this.props.profileProps.user.imageName || "",
-          redirectF: this.props.profileProps.redirectF 
+          redirectF: this.props.profileProps.redirectF,
         });
+      }
+      if (this.props.profileProps.errorFlag) {
+        console.log("Error!!!!!!!!!!!!!!!!!!!!!!!!!");
+        this.setState({
+          errorMessage: "Email Already exists",
+          errorFlag: true,
+          redirectF: false,
+        });
+        this.getUserData();
+      }
     }
   }
 
@@ -103,14 +115,11 @@ class ProfilePage extends Component {
     });
   }
   onTodoPhoneChange = (e) => {
-    const re = /^[0-9\b]+$/;
-    
     // if value is not blank, then test the regex
-    if (e.target.value === "" || re.test(e.target.value)) {
-      this.setState({
-        phoneNumber: e.target.value,
-      });
-    }
+
+    this.setState({
+      phoneNumber: e.target.value,
+    });
   };
   onTodoCurrencyChange(value) {
     this.setState({
@@ -147,7 +156,7 @@ class ProfilePage extends Component {
     console.log(localdata);
     console.log(data);
 
-    this.props.setProfile(data)
+    this.props.setProfile(data);
 
     // const response = axiosInstance
     //   .put(
@@ -166,20 +175,45 @@ class ProfilePage extends Component {
   };
 
   render() {
+    if (!JSON.parse(localStorage.getItem("user"))) {
+      return (
+        <Redirect
+          to={{
+            pathname: "/login",
+          }}
+        ></Redirect>
+      );
+    }
     const redirectCheck = () => {
       if (this.state.redirectF) {
         this.setState({
-        redirectF: false
-        })
+          redirectF: false,
+        });
         return <Redirect to={{ pathname: "/dashboard" }}></Redirect>;
       }
     };
-    
+    const renderError = () => {
+      if (this.state.errorFlag) {
+        console.log("printing");
+        return <Alert variant="danger">{this.state.errorMessage}</Alert>;
+      }
+      setTimeout(() => {
+        this.setState(
+          {
+            errorFlag: false,
+          },
+          () => {
+            // this.getUserData();
+          }
+        );
+      }, 7000);
+    };
 
     return (
       <div>
         {redirectCheck()}
         <Container>
+          {renderError()}
           <Row>
             <Col xs={6} md={4}>
               <FileUpload imageName={this.state.imageName}></FileUpload>
@@ -187,7 +221,7 @@ class ProfilePage extends Component {
 
             <Col xs="5">
               <form>
-                <label for="name-input">Your Name:</label>
+                <label htmlFor="name-input">Your Name:</label>
                 <br />
                 <input
                   type="text"
@@ -212,6 +246,10 @@ class ProfilePage extends Component {
                   value={this.state.phoneNumber}
                   id={"todoPhone" + this.props.id}
                   onChange={this.onTodoPhoneChange}
+                  onKeyDown={(evt) =>
+                    (evt.key === "e" || evt.key === "-" || evt.key === ".") &&
+                    evt.preventDefault()
+                  }
                   type="number"
                 ></input>
                 <br />
@@ -330,6 +368,6 @@ const mapStateToProps = (state, props) => {
 
 const actionCreators = {
   getProfile: ProfilePageAction.getProfile,
-  setProfile: ProfilePageAction.setProfile
+  setProfile: ProfilePageAction.setProfile,
 };
 export default connect(mapStateToProps, actionCreators)(ProfilePage);

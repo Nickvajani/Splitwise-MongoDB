@@ -4,14 +4,13 @@ import axios from "axios";
 import Dropdown from "react-bootstrap/Dropdown";
 import DropdownButton from "react-bootstrap/DropdownButton";
 import axiosInstance from "../helpers/axios";
+import { Redirect } from "react-router";
 import { connect } from "react-redux";
 import { RecentActivityAction } from "../redux/recentActivity/RecentActivityAction";
 import DataTable from "react-data-table-component";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faShoppingCart } from '@fortawesome/free-solid-svg-icons'
-import { faMoneyBill } from '@fortawesome/free-solid-svg-icons'
-
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faShoppingCart } from "@fortawesome/free-solid-svg-icons";
+import { faMoneyBill } from "@fortawesome/free-solid-svg-icons";
 
 const size = [2, 5, 10];
 class RecentActivity extends Component {
@@ -22,6 +21,7 @@ class RecentActivity extends Component {
       recentActivityDetails: [],
       groupNames: [],
       columns: [],
+      recentActivityPreview: [],
     };
   }
 
@@ -36,6 +36,8 @@ class RecentActivity extends Component {
       if (this.props.recentActivityProps.recentActivity) {
         this.setState({
           recentActivityDetails: this.props.recentActivityProps.recentActivity
+            .recentActivityDetails,
+          recentActivityPreview: this.props.recentActivityProps.recentActivity
             .recentActivityDetails,
         });
       }
@@ -57,7 +59,9 @@ class RecentActivity extends Component {
   };
   getGroupNames = async () => {
     axiosInstance.defaults.withCredentials = true;
-    axiosInstance.defaults.headers.common['authorization'] = JSON.parse(localStorage.getItem('token'));
+    axiosInstance.defaults.headers.common["authorization"] = JSON.parse(
+      localStorage.getItem("token")
+    );
 
     const response1 = await axiosInstance
       .get("/recentActivity/groupNames", {
@@ -70,6 +74,7 @@ class RecentActivity extends Component {
       });
   };
   getRecentActivity = async () => {
+    console.log("calling");
     this.props.getRecentActivityDetails();
     // axiosInstance.defaults.withCredentials = true;
     // const response1 = await axiosInstance
@@ -91,7 +96,7 @@ class RecentActivity extends Component {
       return new Date(a.created_at) - new Date(b.created_at);
     });
     this.setState({
-      recentActivityDetails: sortArray,
+      recentActivityPreview: sortArray,
     });
   };
   sortForMostRecentFirst = async (e) => {
@@ -102,17 +107,16 @@ class RecentActivity extends Component {
       return new Date(b.created_at) - new Date(a.created_at);
     });
     this.setState({
-      recentActivityDetails: sortArray,
+      recentActivityPreview: sortArray,
     });
   };
   filterGroups = async (e, name) => {
     e.preventDefault();
-    //  await this.getRecentActivity(e);
     let newArray = this.state.recentActivityDetails.filter(
       (gname) => gname.groupName == name
     );
     this.setState({
-      recentActivityDetails: newArray,
+      recentActivityPreview: newArray,
     });
   };
   async componentDidMount() {
@@ -123,21 +127,38 @@ class RecentActivity extends Component {
     this.state.columns = [
       {
         cell: (row) => (
-          <div><big>
-            {row.amount!=0?<FontAwesomeIcon icon={faShoppingCart } fa-7x></FontAwesomeIcon>:<FontAwesomeIcon icon={faMoneyBill} fa-7x></FontAwesomeIcon>}
-            <strong>
-              {row.payerName ==
-              JSON.parse(localStorage.getItem("user"))?.username
-                ? " You"
-                : " " +row.payerName}{" "}
-            </strong>{" "}
-            Added <strong>{row.description}</strong> in{" "}
-            <strong>{row.groupName}</strong>
-            
-            <p style={{ color: "red", textAlign:"left" }}>{row.amount>=1?"You Owe " + this.state.userDefaultCurrency + row.amount:""}</p>
-            <p style={{ color: "green",textAlign:"left" }}>{row.amount<0?"You Get Back "+ this.state.userDefaultCurrency + row.amount * -1:""}</p>
-            <p  style={{ textAlign:"left" }}>{row.amount==0? "This transaction is settled": "" }</p>
-            </big> </div>
+          <div>
+            <big>
+              {row.amount != 0 ? (
+                <FontAwesomeIcon icon={faShoppingCart} fa-7x></FontAwesomeIcon>
+              ) : (
+                <FontAwesomeIcon icon={faMoneyBill} fa-7x></FontAwesomeIcon>
+              )}
+              <strong>
+                {row.payerName ==
+                JSON.parse(localStorage.getItem("user"))?.username
+                  ? " You"
+                  : " " + row.payerName}{" "}
+              </strong>{" "}
+              Added <strong>{row.description}</strong> in{" "}
+              <strong>{row.groupName}</strong>
+              <p style={{ color: "red", textAlign: "left" }}>
+                {row.amount >= 1
+                  ? "You Owe " + this.state.userDefaultCurrency + row.amount
+                  : ""}
+              </p>
+              <p style={{ color: "green", textAlign: "left" }}>
+                {row.amount < 0
+                  ? "You Get Back " +
+                    this.state.userDefaultCurrency +
+                    row.amount * -1
+                  : ""}
+              </p>
+              <p style={{ textAlign: "left" }}>
+                {row.amount == 0 ? "This transaction is settled" : ""}
+              </p>
+            </big>{" "}
+          </div>
         ),
         // format: (row, index) => {
         //   let str = "";
@@ -183,6 +204,15 @@ class RecentActivity extends Component {
     ];
   }
   render() {
+    if (!JSON.parse(localStorage.getItem("user"))) {
+      return (
+        <Redirect
+          to={{
+            pathname: "/login",
+          }}
+        ></Redirect>
+      );
+    }
     let amountCheck = (value) => {
       let amount = parseFloat(value);
       if (amount >= 1) {
@@ -247,10 +277,7 @@ class RecentActivity extends Component {
               Sort by:
             </Col>
             <Col xs="3" style={{ backgroundColor: "lightgray" }}>
-              <DropdownButton
-                id="dropdown-basic-button"
-                title="Most recent on top"
-              >
+              <DropdownButton id="dropdown-basic-button" title="Most recent">
                 <Dropdown.Item
                   onClick={(e) => {
                     this.sortForMostRecentLast(e);
@@ -270,10 +297,10 @@ class RecentActivity extends Component {
           </Row>
           <Row>
             <Col xs="2"></Col>
-            <Col >
-              <DataTable 
+            <Col>
+              <DataTable
                 columns={this.state.columns}
-                data={this.state.recentActivityDetails}
+                data={this.state.recentActivityPreview}
                 paginationRowsPerPageOptions={size}
                 paginationPerPage={2}
                 // customStyles={customStyles}

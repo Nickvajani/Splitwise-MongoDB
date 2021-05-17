@@ -1,10 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const {checkAuth} = require("../../config/passport")
-var kafka = require('../../kafka/client');
+const { checkAuth } = require("../../config/passport");
+var kafka = require("../../kafka/client");
 
-
-router.post("/getName", checkAuth , (req, res) => {
+router.post("/getName", checkAuth, (req, res) => {
   let name = req.body.name;
 
   kafka.make_request("get_Name", name, function (err, results) {
@@ -17,7 +16,7 @@ router.post("/getName", checkAuth , (req, res) => {
     } else {
       console.log("Inside router post");
       res.status(200).send(results);
-}
+    }
   });
 
   // User.find({ name: new RegExp(name, "i") }, (err, result) => {
@@ -37,7 +36,7 @@ router.post("/getName", checkAuth , (req, res) => {
   // });
 });
 
-router.post("/getEmail", checkAuth , (req, res) => {
+router.post("/getEmail", checkAuth, (req, res) => {
   let email = req.body.email;
   console.log(email);
 
@@ -51,7 +50,7 @@ router.post("/getEmail", checkAuth , (req, res) => {
     } else {
       console.log("Inside router post");
       res.status(200).send(results);
-}
+    }
   });
 
   // User.find({ email: new RegExp(email, "i") }, (err, result) => {
@@ -73,13 +72,13 @@ router.post("/getEmail", checkAuth , (req, res) => {
   // });
 });
 
-router.post("/", checkAuth , (req, res) => {
+router.post("/", checkAuth, (req, res) => {
   let group_admin = req.header("user");
   var data = {
     group_admin: group_admin,
     users: req.body.users,
-    g_name: req.body.g_name
-  }
+    g_name: req.body.g_name,
+  };
 
   kafka.make_request("create_group", data, function (err, results) {
     if (err) {
@@ -89,11 +88,15 @@ router.post("/", checkAuth , (req, res) => {
         msg: "System Error, Try Again.",
       });
     } else {
-      console.log("Inside router post");
-          res.status(200).json({ msg: "Group Created successfully" });
+      console.log(results);
+      if (results === "Group Already Exists") {
+        res.status(404).json({ msg: "Group Exists" });
+      } else {
+        console.log("Inside router post");
+        res.status(200).json({ msg: "Group Created successfully" });
       }
+    }
   });
-
 
   // var members = [];
   // req.body.users.forEach((user) => {

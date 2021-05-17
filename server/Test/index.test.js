@@ -9,6 +9,20 @@ describe("Get total Amount", () =>{
     it("GET /dashboard/getTotalGet", (done)=> {
         agent.get("/dashboard/getTotalGet")
         .then(function (res) {
+
+            expect(res).to.have.status(200)  
+            done();
+        })
+        .catch((e) => {
+            done(e)
+        })
+    })
+})
+describe("Get total Amount", () =>{
+    it("GET /dashboard/getTotalOwe", (done)=> {
+        agent.get("/dashboard/getTotalOwe")
+        .then(function (res) {
+
             expect(res).to.have.status(200)  
             done();
         })
@@ -21,10 +35,13 @@ describe("Get total Amount", () =>{
 describe("Put profile", () =>{
     it("PUT /profile", (done)=> {
         let user ={
-            email: "nick@gmail.com",
-            id: 99
+            id:"6066cb0754b39f228494968a",
+            defaultCurrency:"USD" ,
+            email:"nick2@gmail.com",
+            phoneNumber:"7990543556",
+            username:"Nick2"          
         }
-        agent.put("/profile")
+        agent.put("/profile/update")
         .send(user)
         .then(function (res) {
             expect(res).to.have.status(200)  
@@ -39,11 +56,11 @@ describe("Put profile", () =>{
 describe("Post signup", () =>{
     it("POST /signup", (done)=> {
         let user ={
-            name:"naitik",
-            email: "nicccc@gmail.com",
-            password: "nick123"
+            name:"harsh",
+            email: "soni1@gmail.com",
+            password: "user"
         }
-        agent.post("/signup")
+        agent.post("/user/signup")
         .send(user)
         .then(function (res) {
             expect(res).to.have.status(200)  
@@ -55,12 +72,12 @@ describe("Post signup", () =>{
     })
 })
 
-describe("Post profile", () =>{
-    it("POST /profile", (done)=> {
+describe("Get profile", () =>{
+    it("get /profile", (done)=> {
         let user ={
-            email: "nic@gmail.com",
+            email: "nick@gmail.com",
         }
-        agent.post("/profile")
+        agent.post("/profile/get")
         .send(user)
         .then(function (res) {
             expect(res).to.have.status(200)  

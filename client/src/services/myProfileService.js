@@ -7,7 +7,9 @@ export const myProfileService = {
 
 async function getProfile(data) {
   axiosInstance.defaults.withCredentials = true;
-  axiosInstance.defaults.headers.common['authorization'] = JSON.parse(localStorage.getItem('token'));
+  axiosInstance.defaults.headers.common["authorization"] = JSON.parse(
+    localStorage.getItem("token")
+  );
 
   const response = await axiosInstance
     .post("/profile/get", data)
@@ -29,8 +31,13 @@ async function getProfile(data) {
 }
 
 async function setProfile(data) {
+  // console.log("entering service");
+  // console.log(data);
+
   axiosInstance.defaults.withCredentials = true;
-  axiosInstance.defaults.headers.common['authorization'] = JSON.parse(localStorage.getItem('token'));
+  axiosInstance.defaults.headers.common["authorization"] = JSON.parse(
+    localStorage.getItem("token")
+  );
 
   const response = axiosInstance
     .put("/profile/update", data, {
@@ -38,8 +45,15 @@ async function setProfile(data) {
     })
     .then((response) => {
       // this.setState({redirectF: true });
-
-      console.log(response);
+      console.log(data);
+      console.log("service");
+      let localdata = {
+        u_id: data.id,
+        username: data.username,
+        email: data.email,
+      };
+      console.log(localdata);
+      localStorage.setItem("user", JSON.stringify(localdata));
       return response;
     });
   return response;

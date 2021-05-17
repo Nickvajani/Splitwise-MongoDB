@@ -43,7 +43,7 @@ async function register({ name, email, password }) {
   axiosInstance.defaults.withCredentials = true;
   //make a post request with the user data
   const response = axiosInstance.post("/user/signup", data).then((response) => {
-   
+    console.log(response);
     var token = response.data;
     // localStorage.setItem("token", token);
     localStorage.setItem("token", JSON.stringify(token));
@@ -55,7 +55,6 @@ async function register({ name, email, password }) {
     };
     // localStorage.setItem("user", user);
     localStorage.setItem("user", JSON.stringify(user));
-
     return user;
   });
   return response;

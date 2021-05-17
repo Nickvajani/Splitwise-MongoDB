@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./Signup.css";
 import axios from "axios";
-import { signupAction } from '../redux/signup/signupAction';
-import { connect } from 'react-redux';
+import { signupAction } from "../redux/signup/signupAction";
+import { connect } from "react-redux";
 import {
   BrowserRouter as Router,
   Link,
@@ -47,11 +47,9 @@ class Signup extends Component {
     const userData = {
       name: this.state.name,
       email: this.state.email,
-      password: this.state.password
-    }
+      password: this.state.password,
+    };
     this.props.register(userData);
-   
-    
 
     // const data = {
     //   name: this.state.name,
@@ -68,33 +66,41 @@ class Signup extends Component {
     //        }).catch(err => {
     //         alert(err.response.data.msg)
     //         //this.props.history.push("/create")
-           
+
     //     });
   };
   render() {
     const renderError = () => {
       if (this.props.signupProps.errorFlag) {
-        console.log("Render error")
+        console.log("Render error");
 
-        return <Alert variant="danger">Signup failed</Alert>;
+        return <Alert variant="danger">Email Already Exists</Alert>;
       }
       setTimeout(() => {
         this.setState({
-          errorFlag: false
-        })
+          errorFlag: false,
+        });
       }, 3000);
     };
-  
-    if(JSON.parse(localStorage.getItem("user"))){
-      return <Redirect to={{
-        pathname: '/dashboard',
-    }}></Redirect>
+
+    if (JSON.parse(localStorage.getItem("user"))) {
+      return (
+        <Redirect
+          to={{
+            pathname: "/dashboard",
+          }}
+        ></Redirect>
+      );
     }
     return (
       <div>
         <div className="container-fluid">
           <div className="row">
-            <form target="_blank" className="form-container center_div ">
+            <form
+              onSubmit={this.adduser}
+              target="_blank"
+              className="form-container center_div "
+            >
               <div className="form">
                 <div>
                   <h5>INTRODUCE YOURSELF</h5>
@@ -104,54 +110,48 @@ class Signup extends Component {
                     <div className="col">
                       <div className="row">
                         <label>Hi there! My name is</label>
-                      </div>
-                      <br />
-                      <div className="row">
                         <input
                           type="text"
                           onChange={this.usernameHandler}
                           className="form-control"
                           placeholder="First name"
                           name="uname"
-                          required='required'
+                          required
                         />
                       </div>
+                      <br />
                     </div>
                   </div>
                   <div className="row">
                     <div className="col">
                       <div className="row">
                         <label for="email">Here’s my email address:</label>
-                      </div>
-                      <br />
-                      <div className="row">
                         <input
                           type="email"
                           onChange={this.useremailHandler}
                           className="form-control"
                           placeholder="Enter Email"
                           name="email"
-                          required='required'
+                          required
                         />
                       </div>
+                      <br />
                     </div>
                   </div>
                   <div className="row">
                     <div className="col">
                       <div className="row">
                         <label for="psw">And here’s my password:</label>
-                      </div>
-                      <br />
-                      <div className="row">
                         <input
                           type="password"
                           onChange={this.userpasswordHandler}
                           className="form-control"
                           placeholder="Enter Password"
                           name="psw"
-                          required='required'
+                          required
                         />
                       </div>
+                      <br />
                     </div>
                   </div>
                   <div className="clearfix">
@@ -160,8 +160,8 @@ class Signup extends Component {
                       {renderError()}
                       <button
                         type="submit"
-                        onClick={this.adduser}
-                        className="signupbtn btn btn-success btn-lg btn-block">
+                        className="signupbtn btn btn-success btn-lg btn-block"
+                      >
                         Sign Up
                       </button>
                     </div>
@@ -189,12 +189,12 @@ class Signup extends Component {
 
 const mapStateToProps = (state, props) => {
   return {
-    signupProps: state.registerState
-  }
-}
+    signupProps: state.registerState,
+  };
+};
 
 const actionCreators = {
-  register: signupAction.register
-}
+  register: signupAction.register,
+};
 
 export default connect(mapStateToProps, actionCreators)(Signup);

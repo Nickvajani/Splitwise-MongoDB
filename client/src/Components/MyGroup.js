@@ -28,7 +28,7 @@ class MyGroup extends Component {
       leaveGroupFlag: false,
       joinGroupFlag: false,
       successMessage: "",
-      gottoGroupName: ''
+      gottoGroupName: "",
     };
   }
 
@@ -58,12 +58,15 @@ class MyGroup extends Component {
         });
       }
       if (this.props.myGroupsProps.leaveGroupFlag) {
-        this.setState({
-          successMessage: "Group left!!",
-          leaveGroupFlag: true,
-        },()=>{
-          this.joinedGroup()
-        });
+        this.setState(
+          {
+            successMessage: "Group left!!",
+            leaveGroupFlag: true,
+          },
+          () => {
+            this.joinedGroup();
+          }
+        );
       }
       if (this.props.myGroupsProps.errorFlag) {
         this.setState(
@@ -130,12 +133,12 @@ class MyGroup extends Component {
     this.props.joinGroup(idvalue);
     this.joinedGroup();
   };
-  setRedirect = (e, value,name) => {
+  setRedirect = (e, value, name) => {
     e.preventDefault();
     this.setState({
       redirect: true,
       gotoGroupId: value,
-      gottoGroupName: name
+      gottoGroupName: name,
     });
   };
   leaveGroup = async (e, value) => {
@@ -151,7 +154,10 @@ class MyGroup extends Component {
         <Redirect
           to={{
             pathname: "/group",
-            state: { g_id: this.state.gotoGroupId, name: this.state.gottoGroupName },
+            state: {
+              g_id: this.state.gotoGroupId,
+              name: this.state.gottoGroupName,
+            },
           }}
         ></Redirect>
       );
@@ -159,6 +165,15 @@ class MyGroup extends Component {
   };
 
   render() {
+    if (!JSON.parse(localStorage.getItem("user"))) {
+      return (
+        <Redirect
+          to={{
+            pathname: "/login",
+          }}
+        ></Redirect>
+      );
+    }
     const renderError = () => {
       if (this.state.errorFlag) {
         return <Alert variant="danger">{this.state.errorMessage}</Alert>;
@@ -216,7 +231,7 @@ class MyGroup extends Component {
                           this.joinGroup(e, group.g_id);
                         }}
                         size="sm"
-                        style={{marginBottom:"10px"}}
+                        style={{ marginBottom: "10px" }}
                       >
                         Join
                       </Button>
@@ -242,9 +257,9 @@ class MyGroup extends Component {
                         variant="primary"
                         size="sm"
                         onClick={(e) => {
-                          this.setRedirect(e, group.g_id,group.name);
+                          this.setRedirect(e, group.g_id, group.name);
                         }}
-                        style={{marginBottom:"10px"}}
+                        style={{ marginBottom: "10px" }}
                       >
                         Goto Group
                       </Button>
@@ -254,8 +269,7 @@ class MyGroup extends Component {
                         onClick={(e) => {
                           this.leaveGroup(e, group.g_id);
                         }}
-                        style={{marginBottom:"10px"}}
-
+                        style={{ marginBottom: "10px" }}
                       >
                         Leave Group
                       </Button>

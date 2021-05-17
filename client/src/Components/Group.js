@@ -5,6 +5,7 @@ import Col from "react-bootstrap/Col";
 import Card from "react-bootstrap/Card";
 import "./Group.css";
 import Button from "react-bootstrap/Button";
+import { Redirect } from "react-router";
 import axios from "axios";
 // import Modal from "./Modal"
 import { Form, Modal } from "react-bootstrap";
@@ -12,9 +13,9 @@ import { Alert } from "react-bootstrap";
 import axiosInstance from "../helpers/axios";
 import { connect } from "react-redux";
 import { GroupsAction } from "../redux/group/groupAction";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTrash } from '@fortawesome/free-solid-svg-icons'
-import { faWallet } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faWallet } from "@fortawesome/free-solid-svg-icons";
 
 class Group extends Component {
   constructor(props) {
@@ -38,16 +39,16 @@ class Group extends Component {
       insertFlag: false,
       owerObject: [],
       showComment: false,
-      IdForComment: '',
-      commentForExpense:'',
+      IdForComment: "",
+      commentForExpense: "",
       commentFlag: true,
-      commentToSave: '',
+      commentToSave: "",
       viewComment: false,
       commentsFetched: [],
       deleteFlag: false,
       deleteMessage: "",
-      idToDelete:'',
-      deleteModal: false
+      idToDelete: "",
+      deleteModal: false,
     };
   }
   componentDidUpdate(prevProps) {
@@ -73,7 +74,7 @@ class Group extends Component {
         });
       }
       if (this.props.groupProps.insertFlag) {
-        console.log(this.props.groupProps.insertFlag)
+        console.log(this.props.groupProps.insertFlag);
         this.setState(
           {
             insertFlag: true,
@@ -81,46 +82,51 @@ class Group extends Component {
             insertMessage: "Added Successfully",
           },
           () => {
-            console.log(this.state.insertFlag)
+            console.log(this.state.insertFlag);
             this.getGroupExpense();
             this.getOweDetails();
           }
         );
       }
-      if(this.props.groupProps.errorFlag){
+      if (this.props.groupProps.errorFlag) {
         this.setState({
-          errorFlag:true,
-          errorMessage: "Not Added"
-        })
+          errorFlag: true,
+          errorMessage: "Not Added",
+        });
       }
-      if(this.props.groupProps.insertCommentFlag){
-        this.setState({
-          showComment:false,
-          insertFlag: true,
-          insertMessage: "Comment Added Successfully",
-        },() => {
-          console.log("added")
-          this.getGroupExpense();
-
-        })
+      if (this.props.groupProps.insertCommentFlag) {
+        this.setState(
+          {
+            showComment: false,
+            insertFlag: true,
+            insertMessage: "Comment Added Successfully",
+          },
+          () => {
+            console.log("added");
+            this.getGroupExpense();
+          }
+        );
       }
-      if(this.props.groupProps.deleteCommentFlag){
-        this.setState({
-          deleteModal: false,
-          viewComment: false,
-          deleteFlag: true,
-          deleteMessage: "Comment Deleted Successfully",
-        },()=>{
-          console.log(this.state.deleteMessage)
-          this.getGroupExpense()
-        })
+      if (this.props.groupProps.deleteCommentFlag) {
+        this.setState(
+          {
+            deleteModal: false,
+            viewComment: false,
+            deleteFlag: true,
+            deleteMessage: "Comment Deleted Successfully",
+          },
+          () => {
+            console.log(this.state.deleteMessage);
+            this.getGroupExpense();
+          }
+        );
       }
     }
   }
   componentDidMount(props) {
     this.setState({
       group_id: this.props.location.state.g_id,
-      groupname: this.props.location.state.name
+      groupname: this.props.location.state.name,
     });
     this.getGroupExpense();
     this.getCurrentUserDetails();
@@ -176,53 +182,64 @@ class Group extends Component {
     });
   };
 
-  showCommentModal =(e,ID) =>{
+  showCommentModal = (e, ID) => {
     e.preventDefault();
+    this.setState(
+      {
+        IdForComment: ID,
+        showComment: true,
+      },
+      () => {
+        console.log(this.state.IdForComment);
+      }
+    );
+  };
+  hideCommentModal = () => {
+    this.setState(
+      {
+        showComment: false,
+        IdForComment: "",
+        commentFlag: true,
+      },
+      () => {
+        console.log(this.state.IdForComment);
+      }
+    );
+  };
+  hideViewCommentModal = () => {
     this.setState({
-      IdForComment: ID,
-      showComment: true
-    },()=>{console.log(this.state.IdForComment)})
-  }
-  hideCommentModal = () =>{
+      viewComment: false,
+    });
+  };
+  hideDeleteConfirmationModal = () => {
     this.setState({
-      showComment:false,
-      IdForComment: '',
-      commentFlag: true
-    },()=>{console.log(this.state.IdForComment)})
-  }
-  hideViewCommentModal= () =>{
-    this.setState({
-      viewComment: false
-    })
-  }
-  hideDeleteConfirmationModal =()=>{
-    this.setState({
-      deleteModal:false
-    })
-  }
+      deleteModal: false,
+    });
+  };
   hideModal = () => {
     this.setState({
       show: false,
     });
   };
 
-  handleCommentChange(e){
-    this.setState({
-      commentForExpense: e.target.value
-    },() => {
-      if(e.target.value.length>0){
-        this.setState({
-          commentFlag: false
-        })
-      }else{
-        this.setState({
-          commentFlag: true
-        })
+  handleCommentChange(e) {
+    this.setState(
+      {
+        commentForExpense: e.target.value,
+      },
+      () => {
+        if (e.target.value.length > 0) {
+          this.setState({
+            commentFlag: false,
+          });
+        } else {
+          this.setState({
+            commentFlag: true,
+          });
+        }
       }
-    })
-
+    );
   }
-
 
   handleDescriptionChange(e) {
     this.setState(
@@ -264,20 +281,23 @@ class Group extends Component {
     );
   }
 
-  handleCommentSubmit = (e) =>{
+  handleCommentSubmit = (e) => {
     e.preventDefault();
-    if(this.state.commentForExpense.length >=1){
-      this.setState({
-        commentToSave: this.state.commentForExpense
-      },async() => {
-        let data = {
-          t_id: this.state.IdForComment,
-          comment: this.state.commentToSave
+    if (this.state.commentForExpense.length >= 1) {
+      this.setState(
+        {
+          commentToSave: this.state.commentForExpense,
+        },
+        async () => {
+          let data = {
+            t_id: this.state.IdForComment,
+            comment: this.state.commentToSave,
+          };
+          this.props.addComment(data);
         }
-        this.props.addComment(data)
-      })
+      );
     }
-  }
+  };
   handleSubmit = (e) => {
     e.preventDefault();
     if (
@@ -294,7 +314,7 @@ class Group extends Component {
             amount: this.state.amountToSave,
             currency: this.state.userDefaultCurrency,
             description: this.state.descriptionToSave,
-            group_id: this.state.group_id
+            group_id: this.state.group_id,
           };
           console.log(data);
           console.log(Object.values(data).length);
@@ -305,31 +325,32 @@ class Group extends Component {
       );
     }
   };
-  viewComment = (e,comments) =>{
+  viewComment = (e, comments) => {
     e.preventDefault();
-    this.setState({
-      viewComment: true,
-      commentsFetched: comments
-    },()=>{
-      console.log(this.state.commentsFetched)
-    })
-  }
-  deleteComfirmation = async(e,id)=>{
+    this.setState(
+      {
+        viewComment: true,
+        commentsFetched: comments,
+      },
+      () => {
+        console.log(this.state.commentsFetched);
+      }
+    );
+  };
+  deleteComfirmation = async (e, id) => {
     this.setState({
       idToDelete: id,
-      deleteModal:true
-    })
+      deleteModal: true,
+    });
+  };
 
-  }
-
-
-  deleteComment =async(e,id)=>{
+  deleteComment = async (e, id) => {
     e.preventDefault();
-    console.log(id)
+    console.log(id);
     let data = {
       c_id: id,
     };
-    this.props.deleteComment(data)
+    this.props.deleteComment(data);
     // axiosInstance.defaults.withCredentials = true;
     // axiosInstance.defaults.headers.common['authorization'] = localStorage.getItem('token');
     // const response4 = await axiosInstance
@@ -341,10 +362,17 @@ class Group extends Component {
     //       viewComment: false
     //     },()=>{this.getGroupExpense()});
     //   });
-
-
-  }
+  };
   render() {
+    if (!JSON.parse(localStorage.getItem("user"))) {
+      return (
+        <Redirect
+          to={{
+            pathname: "/login",
+          }}
+        ></Redirect>
+      );
+    }
     const renderSuccess = () => {
       if (this.state.insertFlag) {
         return <Alert variant="success ">{this.state.insertMessage}</Alert>;
@@ -355,16 +383,16 @@ class Group extends Component {
         });
       }, 10000);
     };
-    const renderDelete = () =>{
-    if (this.state.deleteFlag) {
-      return <Alert variant="success ">{this.state.deleteMessage}</Alert>;
-    }
-    setTimeout(() => {
-      this.setState({
-        deleteFlag: false,
-      });
-    }, 10000);
-  };
+    const renderDelete = () => {
+      if (this.state.deleteFlag) {
+        return <Alert variant="success ">{this.state.deleteMessage}</Alert>;
+      }
+      setTimeout(() => {
+        this.setState({
+          deleteFlag: false,
+        });
+      }, 10000);
+    };
 
     const renderError = () => {
       if (this.state.errorFlag) {
@@ -379,7 +407,7 @@ class Group extends Component {
 
     let amountCheck = (value) => {
       let amount = parseFloat(value);
-      if (amount >=1) {
+      if (amount >= 1) {
         return ` Owes ${this.state.userDefaultCurrency}${amount}`;
       } else {
         let newAmount = amount * -1;
@@ -387,7 +415,6 @@ class Group extends Component {
       }
     };
 
-    
     const OwerStyle = {
       textAlign: "left",
       fontFamily: "Arial",
@@ -413,9 +440,9 @@ class Group extends Component {
               </Button>
             </Col>
           </Row>
-              {renderSuccess()}
-              {renderDelete()}
-          <Form >
+          {renderSuccess()}
+          {renderDelete()}
+          <Form>
             <Modal show={this.state.show} onHide={this.hideModal}>
               <Modal.Header closeButton>
                 <Modal.Title>Add an expense</Modal.Title>
@@ -468,8 +495,6 @@ class Group extends Component {
               </Modal.Footer>
             </Modal>
 
-
-
             <Modal show={this.state.showComment} onHide={this.hideCommentModal}>
               <Modal.Header closeButton>
                 <Modal.Title>Add a Note</Modal.Title>
@@ -504,26 +529,44 @@ class Group extends Component {
                 </Button>
               </Modal.Footer>
             </Modal>
-            
 
-
-            <Modal show={this.state.viewComment} onHide={this.hideViewCommentModal}>
+            <Modal
+              show={this.state.viewComment}
+              onHide={this.hideViewCommentModal}
+            >
               <Modal.Header closeButton>
                 <Modal.Title>Comments</Modal.Title>
               </Modal.Header>
               <Modal.Body>
-                {this.state.commentsFetched.length>0 && 
-                this.state.commentsFetched.map((comments,index) => (
-                  <div>
-                   
-                    <Row  style={{ border: "1px solid rgba(0, 0, 0, 0.05)" }}>
-                      <Col xs="2" style={{textAlign:"left"}}>{comments.name}:</Col>
-                      <Col xs="6" style={{textAlign:"left"}}>{comments.comment}</Col>
-                      <Col xs="2">{this.convertDate(comments.created_at)}</Col>
-                      <Col xs="1">{String(comments.name) == String(JSON.parse(localStorage.getItem("user"))?.username)?<FontAwesomeIcon icon={faTrash} onClick={(e) =>{this.deleteComfirmation(e,comments.id)}}/>:null}</Col>
-                    </Row>
-                  </div>
-                ))}
+                {this.state.commentsFetched.length > 0 &&
+                  this.state.commentsFetched.map((comments, index) => (
+                    <div>
+                      <Row style={{ border: "1px solid rgba(0, 0, 0, 0.05)" }}>
+                        <Col xs="2" style={{ textAlign: "left" }}>
+                          {comments.name}:
+                        </Col>
+                        <Col xs="6" style={{ textAlign: "left" }}>
+                          {comments.comment}
+                        </Col>
+                        <Col xs="2">
+                          {this.convertDate(comments.created_at)}
+                        </Col>
+                        <Col xs="1">
+                          {String(comments.name) ==
+                          String(
+                            JSON.parse(localStorage.getItem("user"))?.username
+                          ) ? (
+                            <FontAwesomeIcon
+                              icon={faTrash}
+                              onClick={(e) => {
+                                this.deleteComfirmation(e, comments.id);
+                              }}
+                            />
+                          ) : null}
+                        </Col>
+                      </Row>
+                    </div>
+                  ))}
               </Modal.Body>
               <Modal.Footer>
                 {renderError()}
@@ -531,30 +574,39 @@ class Group extends Component {
                 <Button variant="secondary" onClick={this.hideViewCommentModal}>
                   Close
                 </Button>
-               
               </Modal.Footer>
             </Modal>
 
-            <Modal show={this.state.deleteModal} onHide={this.hideDeleteConfirmationModal}>
-                <Modal.Header closeButton>
+            <Modal
+              show={this.state.deleteModal}
+              onHide={this.hideDeleteConfirmationModal}
+            >
+              <Modal.Header closeButton>
                 <Modal.Title>Delete Comment</Modal.Title>
               </Modal.Header>
               <Modal.Body>
-              Permanently delete this comment?<br></br>
-                <Button variant="secondary" style={{marginRight:"10px"}} onClick={this.hideDeleteConfirmationModal}>
+                Permanently delete this comment?<br></br>
+                <Button
+                  variant="secondary"
+                  style={{ marginRight: "10px" }}
+                  onClick={this.hideDeleteConfirmationModal}
+                >
                   NO
                 </Button>
-                <Button variant="secondary" onClick={(e) =>{this.deleteComment(e,this.state.idToDelete)}}>
+                <Button
+                  variant="secondary"
+                  onClick={(e) => {
+                    this.deleteComment(e, this.state.idToDelete);
+                  }}
+                >
                   yes
                 </Button>
               </Modal.Body>
               <Modal.Footer>
                 {renderError()}
                 {renderSuccess()}
-               
               </Modal.Footer>
             </Modal>
-           
           </Form>
           <Row>
             <Card style={{ width: "50rem" }}>
@@ -562,24 +614,46 @@ class Group extends Component {
                 {this.state.transactionDetails.length > 0 &&
                   this.state.transactionDetails.map((group, index) => (
                     <div key={index}>
-                      <Row style={{ border: "1px solid rgba(0, 0, 0, 0.05)" }} >
-                        <Col xs="3" onClick={(e) =>{this.showCommentModal(e,group.ID)}}>{this.convertDate(group.created_at)}</Col>
-                        <Col xs="3" onClick={(e) =>{this.showCommentModal(e,group.ID)}} style={{ textTransform: "uppercase" }}>
-                        <FontAwesomeIcon icon={faWallet} /> {group.description}
+                      <Row style={{ border: "1px solid rgba(0, 0, 0, 0.05)" }}>
+                        <Col
+                          xs="3"
+                          onClick={(e) => {
+                            this.showCommentModal(e, group.ID);
+                          }}
+                        >
+                          {this.convertDate(group.created_at)}
                         </Col>
-                        <Col xs="3" style={{ textTransform: "uppercase" }} onClick={(e) =>{this.showCommentModal(e,group.ID)}}>
+                        <Col
+                          xs="3"
+                          onClick={(e) => {
+                            this.showCommentModal(e, group.ID);
+                          }}
+                          style={{ textTransform: "uppercase" }}
+                        >
+                          <FontAwesomeIcon icon={faWallet} />{" "}
+                          {group.description}
+                        </Col>
+                        <Col
+                          xs="3"
+                          style={{ textTransform: "uppercase" }}
+                          onClick={(e) => {
+                            this.showCommentModal(e, group.ID);
+                          }}
+                        >
                           <small>{group.payer_name} paid</small>
                           <br></br>
                           {this.state.userDefaultCurrency} {group.amount}
                         </Col>
                         <Col>
-                        <Button variant="success"
-                        size="sm"
-                        onClick={(e) => {
-                          this.viewComment(e, group.comments);
-                        }}>
-                          View Comments
-                        </Button>
+                          <Button
+                            variant="success"
+                            size="sm"
+                            onClick={(e) => {
+                              this.viewComment(e, group.comments);
+                            }}
+                          >
+                            View Comments
+                          </Button>
                         </Col>
                       </Row>
                     </div>
@@ -624,6 +698,6 @@ const actionCreators = {
   getOweDetails: GroupsAction.groupOweDetails,
   addExpense: GroupsAction.addExpense,
   addComment: GroupsAction.addComment,
-  deleteComment:  GroupsAction.deleteComment
+  deleteComment: GroupsAction.deleteComment,
 };
 export default connect(mapStateToProps, actionCreators)(Group);

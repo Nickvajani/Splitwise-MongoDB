@@ -1,28 +1,24 @@
 const express = require("express");
 const router = express.Router();
-const {checkAuth} = require("../../config/passport")
-var kafka = require('../../kafka/client');
+const { checkAuth } = require("../../config/passport");
+var kafka = require("../../kafka/client");
 
-
-
-
-router.get("/invites", checkAuth , (req, res) => {
+router.get("/invites", checkAuth, (req, res) => {
   var current_user = req.header("user");
   console.log(current_user);
 
-  kafka.make_request('get_invites',current_user, function(err,results){
-    if(err){
+  kafka.make_request("get_invites", current_user, function (err, results) {
+    if (err) {
       console.log("Inside err");
       res.json({
-          status:"error",
-          msg:"System Error, Try Again."
-      })
-    }else{
+        status: "error",
+        msg: "System Error, Try Again.",
+      });
+    } else {
       console.log("Inside router post");
       res.send(results);
-
     }
-  })
+  });
 
   // Group.find(
   //   {
@@ -49,7 +45,7 @@ router.get("/invites", checkAuth , (req, res) => {
   // );
 });
 
-router.put("/:id/accept", checkAuth , (req, res) => {
+router.put("/:id/accept", checkAuth, (req, res) => {
   console.log("from accept");
   var current_user = req.header("user");
   var group_id = req.params.id;
@@ -58,23 +54,20 @@ router.put("/:id/accept", checkAuth , (req, res) => {
   console.log(current_user);
   let data = {
     group_id: group_id,
-    current_user: current_user
-  }
-  kafka.make_request('join_group',data, function(err,results){
-    if(err){
+    current_user: current_user,
+  };
+  kafka.make_request("join_group", data, function (err, results) {
+    if (err) {
       console.log("Inside err");
       res.json({
-          status:"error",
-          msg:"System Error, Try Again."
-      })
-    }else{
+        status: "error",
+        msg: "System Error, Try Again.",
+      });
+    } else {
       console.log("Inside router post");
       res.send(results);
-
     }
-  })
-
-
+  });
 
   // Group.updateOne(
   //   {
@@ -94,23 +87,21 @@ router.put("/:id/accept", checkAuth , (req, res) => {
   // );
 });
 
-router.get("/joined", checkAuth , (req, res) => {
+router.get("/joined", checkAuth, (req, res) => {
   var current_user = req.header("user");
 
-  kafka.make_request('get_joined',current_user, function(err,results){
-    if(err){
+  kafka.make_request("get_joined", current_user, function (err, results) {
+    if (err) {
       console.log("Inside err");
       res.json({
-          status:"error",
-          msg:"System Error, Try Again."
-      })
-    }else{
+        status: "error",
+        msg: "System Error, Try Again.",
+      });
+    } else {
       console.log("Inside router post");
       res.send(results);
-
     }
-  })
-
+  });
 
   // Group.find(
   //   {
@@ -137,26 +128,24 @@ router.get("/joined", checkAuth , (req, res) => {
   // );
 });
 
-router.post("/getGroups", checkAuth , (req, res) => {
+router.post("/getGroups", checkAuth, (req, res) => {
   var current_user = req.header("user");
- let data ={
-   current_user :current_user,
-   name: req.body.g_name
- }
-  kafka.make_request('get_groups',data, function(err,results){
-    if(err){
+  let data = {
+    current_user: current_user,
+    name: req.body.g_name,
+  };
+  kafka.make_request("get_groups", data, function (err, results) {
+    if (err) {
       console.log("Inside err");
       res.json({
-          status:"error",
-          msg:"System Error, Try Again."
-      })
-    }else{
+        status: "error",
+        msg: "System Error, Try Again.",
+      });
+    } else {
       console.log("Inside router post");
       res.send(results);
-
     }
-  })
-
+  });
 
   // Group.find(
   //   {
@@ -182,29 +171,24 @@ router.post("/getGroups", checkAuth , (req, res) => {
   // );
 });
 
-router.delete("/leave/:g_id", checkAuth , async (req,res) => {
+router.delete("/leave/:g_id", checkAuth, async (req, res) => {
   var current_user = req.header("user");
-  let data ={
-    current_user :current_user,
-    g_id: req.params.g_id
-  }
-  kafka.make_request('leave_group',data, function(err,results){
-    if(err){
+  let data = {
+    current_user: current_user,
+    g_id: req.params.g_id,
+  };
+  kafka.make_request("leave_group", data, function (err, results) {
+    if (err) {
       console.log("Inside err");
       res.json({
-          status:"error",
-          msg:"System Error, Try Again."
-      })
-    }else{
+        status: "error",
+        msg: "System Error, Try Again.",
+      });
+    } else {
       console.log("Inside router post");
       res.send(results);
-
     }
-  })
-
-
-
-
+  });
 
   // Transaction.find({"ower.u_id" : current_user,"ower.is_settled":false , g_id: req.params.g_id} ,async(err,result) =>{
   //   if(err){
@@ -220,8 +204,7 @@ router.delete("/leave/:g_id", checkAuth , async (req,res) => {
   //       res.status(200).send({ msg: left });      }
   //   }
   // })
-})
-
+});
 
 // const leaveGroup = async (g_id, current_user) => {
 //   Group.findOneAndUpdate({_id:g_id },{$pull:{members:{ID:current_user}}},{multi:true} ,(err,result) => {
@@ -232,8 +215,7 @@ router.delete("/leave/:g_id", checkAuth , async (req,res) => {
 //       console.log(err)
 //     }
 //   })
-  
+
 // };
 
 module.exports = router;
-

@@ -1,10 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const {checkAuth} = require("../../config/passport")
-var kafka = require('../../kafka/client');
+const { checkAuth } = require("../../config/passport");
+var kafka = require("../../kafka/client");
 
-
-router.get("/groupNames", checkAuth  , (req,res) => {
+router.get("/groupNames", checkAuth, (req, res) => {
   var current_user = req.header("user");
 
   kafka.make_request("get_gnames", current_user, function (err, results) {
@@ -16,7 +15,7 @@ router.get("/groupNames", checkAuth  , (req,res) => {
       });
     } else {
       console.log("Inside router post");
-      console.log(results)
+      console.log(results);
       res.status(200).send(results);
     }
   });
@@ -35,8 +34,8 @@ router.get("/groupNames", checkAuth  , (req,res) => {
   //     }
   //   }
   // );
-})
-router.get("/", checkAuth , async (req, res) => {
+});
+router.get("/", checkAuth, async (req, res) => {
   var current_user = req.header("user");
 
   kafka.make_request("get_activity", current_user, function (err, results) {
@@ -48,12 +47,10 @@ router.get("/", checkAuth , async (req, res) => {
       });
     } else {
       console.log("Inside router post");
-      console.log(results)
+      console.log(results);
       res.status(200).send(results);
     }
   });
-
-
 
   // try {
   //   let listOfGroupId = await new Promise((resolve, reject) => {

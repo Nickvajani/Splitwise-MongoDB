@@ -3,7 +3,6 @@ const router = express.Router();
 const { checkAuth } = require("../../config/passport");
 var kafka = require("../../kafka/client");
 
-
 router.get("/userDetails", checkAuth, (req, res) => {
   var current_user = req.header("user");
 
@@ -390,7 +389,7 @@ router.post("/comment", checkAuth, (req, res) => {
 
 router.delete("/deleteComment/:c_id", checkAuth, async (req, res) => {
   var comment_id = req.params.c_id;
-  
+
   kafka.make_request("delete_comment", comment_id, function (err, results) {
     if (err) {
       console.log("Inside err");
@@ -400,10 +399,10 @@ router.delete("/deleteComment/:c_id", checkAuth, async (req, res) => {
       });
     } else {
       console.log("Inside router post");
-        res.status(200).send({ msg: "Comment Removed" });
-}
+      res.status(200).send({ msg: "Comment Removed" });
+    }
   });
-  
+
   // Transaction.findOneAndUpdate(
   //   { "comments._id": comment_id },
   //   { $pull: { comments: { _id: comment_id } } },

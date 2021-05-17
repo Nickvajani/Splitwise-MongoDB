@@ -18,8 +18,10 @@ function handle_request(msg, callback) {
     },
     (err, result) => {
       if (err) {
-        console.log(err);
+        callback(null, "Error");
+        // console.log(err);
       } else {
+        // console.log(result);
         callback(null, result);
       }
     }

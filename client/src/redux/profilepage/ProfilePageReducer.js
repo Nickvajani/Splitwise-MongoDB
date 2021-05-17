@@ -15,6 +15,7 @@ export function profileReducer(state = initialState, action) {
       };
     case profileConstants.PROFILE_SUCCESS:
       return {
+        profileUpdated: true,
         user: action.user,
       };
     case profileConstants.UPDATE_REQUEST:

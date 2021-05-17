@@ -8,6 +8,7 @@ import Form from "react-bootstrap/Form";
 import axios from "axios";
 import Suggestions from "./Suggestions";
 import Button from "react-bootstrap/Button";
+import FileUpload from "./FileUpload";
 import ListGroup from "react-bootstrap/ListGroup";
 import { Alert } from "react-bootstrap";
 import { Redirect } from "react-router";
@@ -38,9 +39,12 @@ class CreateGroup extends Component {
       groupCreatedMessage: "",
       redirectF: false,
       createGroupFlag: true,
+      GroupimageName: "",
+      errorMessage: "",
+      errorFlag: false,
     };
   }
-  async componentDidUpdate (prevProps) {
+  async componentDidUpdate(prevProps) {
     if (prevProps.createGroupProps !== this.props.createGroupProps) {
       if (this.props.createGroupProps.receivedEmails) {
         this.setState({
@@ -48,7 +52,7 @@ class CreateGroup extends Component {
         });
       }
       if (this.props.createGroupProps.receivedNames) {
-         this.setState({
+        this.setState({
           results: this.props.createGroupProps.receivedNames.result,
         });
       }
@@ -56,14 +60,15 @@ class CreateGroup extends Component {
         this.setState({
           groupCreatedMessage: "Group Created Successfully",
           groupCreateFlag: true,
-          redirectF: true
+          redirectF: true,
         });
       }
       if (this.props.createGroupProps.errorFlag) {
-        console.log("error")
+        console.log("error");
         this.setState({
           errorMessage: "Group Already exists with the same name",
-            errorFlag: true,
+          errorFlag: true,
+          redirectF: false,
         });
       }
     }
@@ -193,7 +198,7 @@ class CreateGroup extends Component {
         if (this.state.results2.length == 1) {
           //check whether the last suggested name and entered name are same then set state for final values
           if (this.state.query2 == this.state.results2[0].email) {
-            console.log("checking")
+            console.log("checking");
 
             //if userDetails has no data then directly add from else part
             if (this.state.userDetails.length != 0) {
@@ -203,7 +208,7 @@ class CreateGroup extends Component {
                   this.state.query2 != this.state.userDetails[i].name &&
                   this.state.query2 != this.state.currentUserEmail
                 ) {
-                  console.log("matched")
+                  console.log("matched");
                   this.setState({
                     finalId: this.state.results2[0].id,
                     finalName: this.state.results2[0].name,
@@ -252,7 +257,6 @@ class CreateGroup extends Component {
         if (this.state.query && this.state.query.length >= 1) {
           this.getInfo();
         }
-
 
         //store only when the suggested list length is 1
         if (this.state.results && this.state.results.length == 1) {
@@ -325,26 +329,37 @@ class CreateGroup extends Component {
           groupCreateFlag: false,
         });
         redirectCheck();
-      }, 6500);
+      }, 9000);
     };
-   
+
     const renderError = () => {
       if (this.state.errorFlag) {
+        console.log("printing");
         return <Alert variant="danger">{this.state.errorMessage}</Alert>;
       }
       setTimeout(() => {
         this.setState({
           errorFlag: false,
         });
-      }, 1000);
+      }, 9000);
     };
 
     const redirectCheck = () => {
       if (this.state.redirectF) {
         this.setState({
-          redirectF: false
-        })
-        return <Redirect to={{ pathname: "/dashboard", state:{ groupCreateFlag: this.state.groupCreateFlag, groupCreatedMessage:this.state.groupCreatedMessage} }}></Redirect>;
+          redirectF: false,
+        });
+        return (
+          <Redirect
+            to={{
+              pathname: "/dashboard",
+              state: {
+                groupCreateFlag: this.state.groupCreateFlag,
+                groupCreatedMessage: this.state.groupCreatedMessage,
+              },
+            }}
+          ></Redirect>
+        );
       }
     };
 
@@ -353,7 +368,7 @@ class CreateGroup extends Component {
         {redirectCheck()}
         <Container>
           <Row>
-            <Col>
+            {/* <Col>
               <Image src="holder.js/171x180" rounded />
               <Form>
                 <Form.Group>
@@ -363,15 +378,18 @@ class CreateGroup extends Component {
                   />
                 </Form.Group>
               </Form>
+            </Col> */}
+            <Col xs={6} md={4}>
+              <FileUpload imageName={this.state.GroupimageName}></FileUpload>
             </Col>
             <Col>
               {renderSuccess()}
               {renderError()}
-              <label for="name-input" style={{ fontSize: "13px" }}>
+              <label htmlFor="name-input" style={{ fontSize: "13px" }}>
                 START A NEW GROUP:
               </label>
               <br />
-              <label for="name-input" style={{ fontSize: "16px" }}>
+              <label htmlFor="name-input" style={{ fontSize: "16px" }}>
                 MY GROUP SHALL BE CALLED:
               </label>
               <br></br>
@@ -385,7 +403,7 @@ class CreateGroup extends Component {
             </Col>
             <form style={{ textAlign: "left" }}>
               <Col>
-                <label for="name-input" style={{ fontSize: "13px" }}>
+                <label htmlFor="name-input" style={{ fontSize: "13px" }}>
                   GROUP MEMBERS:
                 </label>
                 <br></br>

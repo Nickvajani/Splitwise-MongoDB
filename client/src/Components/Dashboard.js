@@ -9,7 +9,6 @@ import { connect } from "react-redux";
 import { DashboardAction } from "../redux/dashboard/dashboardAction";
 import { Alert } from "react-bootstrap";
 
-
 class Dashboard extends Component {
   constructor(props) {
     super(props);
@@ -47,11 +46,14 @@ class Dashboard extends Component {
         });
       }
       if (this.props.dashboardProps.userOwe) {
-        this.setState({
-          userTotalOwe: this.props.dashboardProps.userOwe.userTotalOwe,
-        },()=>{
-          this.getUserGetBackAmount();
-        });
+        this.setState(
+          {
+            userTotalOwe: this.props.dashboardProps.userOwe.userTotalOwe,
+          },
+          () => {
+            this.getUserGetBackAmount();
+          }
+        );
       }
       if (this.props.dashboardProps.userGet) {
         this.setState(
@@ -78,33 +80,38 @@ class Dashboard extends Component {
         });
       }
       if (this.props.dashboardProps.settledFlag) {
-        this.setState({
-          insertMessage: this.props.dashboardProps.settle.insertMessage,
-          show: false,
-          settleGroupNameResults: [],
-          settlePersonResults: [],
-          settleFlag: true,
-        },async()=>{
-          const r1 = await this.getCurrentUserDetails();
-    const r2 = await this.getNumberOfGroups();
-    const r3 = await this.getUserOweAmount();
-    const r4 = await this.getUserGetBackAmount();
-    const r5 = await this.getUserTotal();
-        });
+        this.setState(
+          {
+            insertMessage: this.props.dashboardProps.settle.insertMessage,
+            show: false,
+            settleGroupNameResults: [],
+            settlePersonResults: [],
+            settleFlag: true,
+          },
+          async () => {
+            const r1 = await this.getCurrentUserDetails();
+            const r2 = await this.getNumberOfGroups();
+            const r3 = await this.getUserOweAmount();
+            const r4 = await this.getUserGetBackAmount();
+            const r5 = await this.getUserTotal();
+          }
+        );
       }
       if (this.props.dashboardProps.notSettledFlag) {
         this.setState({
           errorMessage: "Not able to Settle",
-              errorFlag: true,
-              settleGroupNameResults: [],
-              settlePersonResults: []
+          errorFlag: true,
+          settleGroupNameResults: [],
+          settlePersonResults: [],
         });
       }
     }
   }
   getNumberOfGroups = async () => {
     axiosInstance.defaults.withCredentials = true;
-    axiosInstance.defaults.headers.common['authorization'] = JSON.parse(localStorage.getItem('token'));
+    axiosInstance.defaults.headers.common["authorization"] = JSON.parse(
+      localStorage.getItem("token")
+    );
     const response4 = await axiosInstance
       .get("/dashboard/getGroupsId", {
         headers: { user: JSON.parse(localStorage.getItem("user"))?.u_id },
@@ -115,12 +122,11 @@ class Dashboard extends Component {
             numberOfGroups: response.data,
           },
           () => {
-            console.log("groups ids")
+            console.log("groups ids");
             console.log(this.state.numberOfGroups);
           }
         );
       });
-      
 
     for (let i = 0; i < this.state.numberOfGroups.length; i++) {
       let names = await this.getGroupNames(this.state.numberOfGroups[i]);
@@ -129,20 +135,25 @@ class Dashboard extends Component {
     let arr = [];
     for (let i = 0; i < this.state.numberOfGroups.length; i++) {
       let s = await this.getGroupDetails(this.state.numberOfGroups[i]);
-      console.log(s)
+      console.log(s);
       arr.push(s);
-    //  if(s!= null)
+      //  if(s!= null)
     }
-    console.log(arr)
-    this.setState({
-      groupDetails: arr,
-    },()=>{
-      console.log(this.state.groupDetails)
-    });
+    console.log(arr);
+    this.setState(
+      {
+        groupDetails: arr,
+      },
+      () => {
+        console.log(this.state.groupDetails);
+      }
+    );
   };
   getGroupNames = async (value) => {
     axiosInstance.defaults.withCredentials = true;
-    axiosInstance.defaults.headers.common['authorization'] = JSON.parse(localStorage.getItem('token'));
+    axiosInstance.defaults.headers.common["authorization"] = JSON.parse(
+      localStorage.getItem("token")
+    );
 
     const response5 = await axiosInstance
       .get("/dashboard/getGroupNames", {
@@ -163,7 +174,9 @@ class Dashboard extends Component {
   };
   getGroupDetails = async (value) => {
     axiosInstance.defaults.withCredentials = true;
-    axiosInstance.defaults.headers.common['authorization'] = JSON.parse(localStorage.getItem('token'));
+    axiosInstance.defaults.headers.common["authorization"] = JSON.parse(
+      localStorage.getItem("token")
+    );
 
     const response4 = await axiosInstance
       .get("/groups/owe", {
@@ -174,21 +187,21 @@ class Dashboard extends Component {
       .then((response) => {
         // console.log(response.data);
         // console.log(JSON.parse(localStorage.getItem("user"))?.username);
-        let s = {}
+        let s = {};
         // for(let i=0;i<response.data.length;i++){
-          // if(response.data[i].name == JSON.parse(localStorage.getItem("user"))?.username){
-            for (let obj of response.data) {
-              if (!s[obj.group_name]) s[obj.group_name] = [];
-              s[obj.group_name].push(obj);
-            }
-          //}
+        // if(response.data[i].name == JSON.parse(localStorage.getItem("user"))?.username){
+        for (let obj of response.data) {
+          if (!s[obj.group_name]) s[obj.group_name] = [];
+          s[obj.group_name].push(obj);
+        }
         //}
-        console.log(s)
+        //}
+        console.log(s);
         // if(Object.keys(s).length > 0)
         return s;
         // else
         // return null
-       
+
         // console.log(this.state.groupDetails)
         // this.state.groupDetails.push(response.data);
       });
@@ -219,8 +232,6 @@ class Dashboard extends Component {
 
     //  this.dispGroupDetails();
     // this.getGroupNames();
-
-    
   }
   showModal = () => {
     this.setState({
@@ -418,7 +429,7 @@ class Dashboard extends Component {
 
     let amountCheck = (value) => {
       let amount = parseFloat(value);
-      if (amount >=1) {
+      if (amount >= 1) {
         return ` Owe ${this.state.userDefaultCurrency} ${amount}`;
       } else {
         let newAmount = amount * -1;
@@ -435,7 +446,6 @@ class Dashboard extends Component {
     };
     return (
       <div>
-        
         <Container fluid>
           <Row>
             <Col xs="2">
@@ -456,13 +466,17 @@ class Dashboard extends Component {
               <h1>DashBoard</h1>
             </Col>
             <Col style={{ backgroundColor: "lightgray" }}>
-              <Button variant="success" onClick={this.showModal}>
+              <Button
+                variant="success"
+                onClick={this.showModal}
+                title="settleButton"
+              >
                 {" "}
                 Settle Up
               </Button>
             </Col>
           </Row>
-          <Row >
+          <Row>
             <Col xs="2"></Col>
             <Col xs="3" style={UserStyle}>
               <p>total balances</p> {this.state.userDefaultCurrency}{" "}
@@ -531,20 +545,20 @@ class Dashboard extends Component {
             </Modal>
           </Form>
 
-          <Row >
+          <Row>
             <Col xs="2"></Col>
 
-            <Col
-              style={
-                ({ border: "1px solid rgba(0, 0, 0, 0.05)" }
-                )
-              }
-            >
+            <Col style={{ border: "1px solid rgba(0, 0, 0, 0.05)" }}>
               <p>Details about each group</p>
               {this.state.groupDetails.length > 0 &&
                 this.state.groupDetails.map((group, index) => (
                   <div key={index}>
-                    <Row  style={{ border: "1px solid rgba(0, 0, 0, 0.09)" , textAlign:"left"}} >
+                    <Row
+                      style={{
+                        border: "1px solid rgba(0, 0, 0, 0.09)",
+                        textAlign: "left",
+                      }}
+                    >
                       <Col
                         xs="10"
                         style={
